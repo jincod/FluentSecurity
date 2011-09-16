@@ -10,10 +10,22 @@
 		depend on other tasks. These are the targets you intend to get called from any
 		command line or build server. Feel free to add, remove and customize to fit your needs.
 	-->
-	<target name="Minimal" description="Compiles" depends="Clean, AssemblyInfo, Compile" />
-	<target name="Default" description="Compiles and runs tests" depends="Clean, AssemblyInfo, Compile, Run-Unit-Tests" />
-	<target name="Full" description="Compiles, runs tests and publishes" depends="Clean, AssemblyInfo, Compile, Run-Unit-Tests, Run-Acceptance-Tests, Package, Publish" />
-	<target name="Pack" description="Package" depends="Package" />
+	<target name="Minimal" description="Compiles">
+		<property name="build.target.name" value="Minimal" />
+		<call target="Run-Targets" />
+	</target>
+	<target name="Default" description="Compiles and runs tests">
+		<property name="build.target.name" value="Default" />
+		<call target="Run-Targets" />
+	</target>
+	<target name="Full" description="Compiles, runs tests and publishes">
+		<property name="build.target.name" value="Full" />
+		<call target="Run-Targets" />
+	</target>
+	<target name="Pack" description="Package">
+		<property name="build.target.name" value="Pack" />
+		<call target="Run-Targets" />
+	</target>
 
 	<!-- ROOT DIRECTORY
 		Must be relative to this file
@@ -30,8 +42,6 @@
 	
 	<property name="dir.build"			value="${dir.root}Build\"/>
 	<property name="dir.output"			value="${dir.build}Output\"/>
-	<property name="dir.reports"		value="${dir.build}Reports\"/>
-	<property name="dir.artifacts"		value="${dir.build}Artifacts\"/>
 	
 	<!-- COMMON ASSEMBLY INFO
 		Properties used when creating the common assembly info file
@@ -40,20 +50,16 @@
 	<property name="project.version.label" value="1.2.0" /><!-- Example: 1.0.0Beta1 -->
 	<property name="project.config" value="release" />
 	
+	<!-- MVC TARGETS VERSIONS
+		Declares the projects to build. You can also specify a solution file (.sln) if you want.
+	-->
+	<property name="product.mvc.targets" value="Mvc3" />
+	
 	<!-- PROJECTS TO BUILD
 		Declares the projects to build. You can also specify a solution file (.sln) if you want.
 	-->
 	<fileset id="projects">
 		<include name="${dir.source}FluentSecurity.sln" />
-	</fileset>
-	
-	<!-- TEST AND ACCEPTANCE TEST ASSEMBLIES
-		Patterns for unit and acceptance -test assemblies.
-	-->
-	<fileset id="unit-test-assemblies" basedir="${dir.output}">
-		<include name="*.Specification.dll" />
-	</fileset>
-	<fileset id="acceptance-test-assemblies" basedir="${dir.output}">
 	</fileset>
 	
 	<!-- TEST RUNNER
@@ -65,7 +71,6 @@
 		Path to the NuGet console.
 	-->
 	<property name="nuget.console" value="${dir.packages}NuGet.CommandLine.1.4.20615.182\tools\NuGet.exe"/>
-	
 	
 	<!-- VERBOSE
 		Set to true if you want the build process to be verbose.
@@ -89,13 +94,44 @@
 	<!-- INTERNAL TARGETS
 		These properties should not be modified unless you really know what you are doing.
 	-->
+	
+	<target name="Run-Targets">
+	
+		<delete verbose="${verbose}">
+			<fileset>
+				<include name="${dir.build}\Targets\**.*" />
+			</fileset>
+		</delete>
+		<sleep seconds="1" />
+		<delete dir="${dir.build}\Targets\" verbose="${verbose}" />
+	
+		<foreach item="String" in="${product.mvc.targets}" delim="," property="mvc-target">
+			
+			<property name="dir.build.target" 				value="${dir.build}Targets\${mvc-target}\"/>
+			<property name="dir.build.target.output"		value="${dir.build.target}Output\"/>
+			<property name="dir.build.target.reports"		value="${dir.build.target}Reports\"/>
+			<property name="dir.build.target.artifacts"		value="${dir.build.target}Artifacts\"/>
+			
+			<echo message="*************************************************" />
+			<echo message="Running build for ${mvc-target}" />
+			<echo message="*************************************************" />
+			
+			<call target="${build.target.name}-Run" />
+			
+		</foreach>
+	
+	</target>
+	
+	<target name="Minimal-Run" description="Compiles" depends="Clean, AssemblyInfo, Compile, Move" />
+	<target name="Default-Run" description="Compiles and runs tests" depends="Clean, AssemblyInfo, Compile, Move, Run-Unit-Tests" />
+	<target name="Full-Run" description="Compiles, runs tests and publishes" depends="Clean, AssemblyInfo, Compile, Move, Run-Unit-Tests, Run-Acceptance-Tests, Package, Publish" />
+	<target name="Pack-Run" description="Package" depends="Move, Package" />
+	
 	<target name="Clean" description="Clean up">
 	
 		<delete verbose="${verbose}">
 			<fileset>
 				<include name="${dir.output}\**.*" />
-				<include name="${dir.reports}\**.*" />
-				<include name="${dir.artifacts}\**\*" />
 			</fileset>
 		</delete>
 		
@@ -154,9 +190,28 @@
 	
 	</target>
 	
+	<target name="Move" description="Moves build output to target build output directory">
+	
+		<mkdir dir="${dir.build.target}" failonerror="false" verbose="${verbose}" />
+	
+		<copy todir="${dir.build.target.output}" verbose="${verbose}">
+			<fileset basedir="${dir.output}">
+				<include name="**.*" />
+			</fileset>
+		</copy>
+		
+	</target>
+	
 	<target name="Run-Unit-Tests" description="Run unit tests">
 	
-		<mkdir dir="${dir.reports}" failonerror="false" verbose="${verbose}" />
+		<mkdir dir="${dir.build.target.reports}" failonerror="false" verbose="${verbose}" />
+		
+		<!-- TEST ASSEMBLIES
+			Patterns for unit test assemblies.
+			-->
+		<fileset id="unit-test-assemblies" basedir="${dir.build.target.output}">
+			<include name="*.Specification.dll" />
+		</fileset>
 	
 		<foreach item="File" property="filename">
 			<in>
@@ -170,7 +225,7 @@
 				<exec program="${nunit.console}" failonerror="false" resultproperty="testresult">
 					<arg value="${filename}" />
 					<arg value="/nologo" unless="${verbose}" />
-					<arg value="/xml=${dir.reports}\${path::get-file-name-without-extension(filename)}-Results.xml" />
+					<arg value="/xml=${dir.build.target.reports}\${path::get-file-name-without-extension(filename)}-Results.xml" />
 				</exec>
 				
 				<property name="nunit.failure" value="${testresult}" unless="${int::parse(nunit.failure) != 0}" />
@@ -186,7 +241,13 @@
 	
 	<target name="Run-Acceptance-Tests" description="Run acceptance tests">
 	
-		<mkdir dir="${dir.reports}" failonerror="false" verbose="${verbose}" />
+		<mkdir dir="${dir.build.target.reports}" failonerror="false" verbose="${verbose}" />
+		
+		<!-- ACCEPTANCE TEST ASSEMBLIES
+			Patterns for acceptance test assemblies.
+			-->
+		<fileset id="acceptance-test-assemblies" basedir="${dir.build.target.output}">
+		</fileset>
 	
 		<foreach item="File" property="filename">
 			<in>
@@ -200,7 +261,7 @@
 				<exec program="${nunit.console}" failonerror="false" resultproperty="testresult">
 					<arg value="${filename}" />
 					<arg value="/nologo" unless="${verbose}" />
-					<arg value="/xml=${dir.reports}\${path::get-file-name-without-extension(filename)}-Results.xml" />
+					<arg value="/xml=${dir.build.target.reports}\${path::get-file-name-without-extension(filename)}-Results.xml" />
 				</exec>
 				
 				<property name="nunit.failure" value="${testresult}" unless="${int::parse(nunit.failure) != 0}" />
@@ -216,22 +277,22 @@
 	
 	<target name="Package" description="Creates build artifacts">
 	
-		<copy todir="${dir.artifacts}FluentSecurity\" verbose="${verbose}">
-			<fileset basedir="${dir.output}">
+		<copy todir="${dir.build.target.artifacts}FluentSecurity\" verbose="${verbose}">
+			<fileset basedir="${dir.build.target.output}">
 				<include name="FluentSecurity.dll" />
 				<include name="FluentSecurity.TestHelper.dll" />
 				<include name="..\..\License.txt" />
 				<include name="..\..\Readme.txt" />
 			</fileset>
 		</copy>
-	
-		<zip zipfile="${dir.artifacts}FluentSecurity-${project.version.label}.zip" verbose="${verbose}">
-			<fileset basedir="${dir.artifacts}FluentSecurity\">
+			
+		<zip zipfile="${dir.build.target.artifacts}FluentSecurity-${project.version.label}.zip" verbose="${verbose}">
+			<fileset basedir="${dir.build.target.artifacts}FluentSecurity\">
 				<include name="**\*.*" />
 			</fileset>
 		</zip>
 		
-		<copy todir="${dir.build}" overwrite="true" verbose="${verbose}">
+		<copy todir="${dir.build.target}" overwrite="true" verbose="${verbose}">
 			<fileset basedir="${dir.build}NuGet\">
 				<include name="*.nuspec" />
 			</fileset>
@@ -244,27 +305,27 @@
 		
 		<exec program="${nuget.console}" failonerror="true">
 			<arg value="pack" />
-			<arg value="${dir.build}FluentSecurity.nuspec" />
+			<arg value="${dir.build.target}FluentSecurity.nuspec" />
 			<arg value="-o" />
-			<arg value="${dir.artifacts}" />
+			<arg value="${dir.build.target.artifacts}" />
 		</exec>
 		
 		<exec program="${nuget.console}" failonerror="true">
 			<arg value="pack" />
-			<arg value="${dir.build}FluentSecurity.TestHelper.nuspec" />
+			<arg value="${dir.build.target}FluentSecurity.TestHelper.nuspec" />
 			<arg value="-o" />
-			<arg value="${dir.artifacts}" />
+			<arg value="${dir.build.target.artifacts}" />
 		</exec>
 		
 		<if test="${directory::exists('C:\Develop\NuGet-Packages')}">
 			<echo message="Publishing NuGet packages to local feed directory" if="${verbose}" />
 			<copy todir="C:\Develop\NuGet-Packages" overwrite="true" verbose="${verbose}">
-				<fileset basedir="${dir.artifacts}">
+				<fileset basedir="${dir.build.target.artifacts}">
 					<include name="*.nupkg" />
 				</fileset>
 			</copy>
 		</if>
-	
+		
 	</target>
 	
 	<target name="Publish" description="Publishes build artifacts">

@@ -1,0 +1,5 @@
+Build/Artifacts/
+Build/CodeCoverage/
+Build/Targets/
+Build/*.nuspec
+CommonAssemblyInfo.cs
