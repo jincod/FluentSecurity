@@ -51,16 +51,9 @@
 	<property name="project.config" value="release" />
 	
 	<!-- MVC TARGETS VERSIONS
-		Declares the projects to build. You can also specify a solution file (.sln) if you want.
+		Declares the MVC target versions.
 	-->
 	<property name="product.mvc.targets" value="Mvc3" />
-	
-	<!-- PROJECTS TO BUILD
-		Declares the projects to build. You can also specify a solution file (.sln) if you want.
-	-->
-	<fileset id="projects">
-		<include name="${dir.source}FluentSecurity.sln" />
-	</fileset>
 	
 	<!-- TEST RUNNER
 		Path to the NUnit console.
@@ -102,18 +95,27 @@
 				<include name="${dir.build}\Targets\**.*" />
 			</fileset>
 		</delete>
-		<sleep seconds="1" />
+		<sleep seconds="3" />
 		<delete dir="${dir.build}\Targets\" verbose="${verbose}" />
 	
-		<foreach item="String" in="${product.mvc.targets}" delim="," property="mvc-target">
+		<foreach item="String" in="${product.mvc.targets}" delim="," property="mvc.target.name">
 			
-			<property name="dir.build.target" 				value="${dir.build}Targets\${mvc-target}\"/>
+			<property name="dir.build.target" 				value="${dir.build}Targets\${mvc.target.name}\"/>
 			<property name="dir.build.target.output"		value="${dir.build.target}Output\"/>
 			<property name="dir.build.target.reports"		value="${dir.build.target}Reports\"/>
 			<property name="dir.build.target.artifacts"		value="${dir.build.target}Artifacts\"/>
 			
+			<if test="${mvc.target.name=='Mvc3'}">
+				<property name="mvc.target.framework" value="4.0" />
+				<property name="mvc.target.version" value="3" />
+				
+				<fileset id="projects">
+					<include name="${dir.source}FluentSecurity.sln" />
+				</fileset>
+			</if>
+			
 			<echo message="*************************************************" />
-			<echo message="Running build for ${mvc-target}" />
+			<echo message="Running build for ${mvc.target.name}" />
 			<echo message="*************************************************" />
 			
 			<call target="${build.target.name}-Run" />
@@ -131,9 +133,11 @@
 	
 		<delete verbose="${verbose}">
 			<fileset>
-				<include name="${dir.output}\**.*" />
+				<include name="${dir.output}**.*" />
 			</fileset>
 		</delete>
+		
+		<delete dir="${dir.output}TestData" verbose="${verbose}" />
 		
 	</target>
 	
@@ -194,11 +198,13 @@
 	
 		<mkdir dir="${dir.build.target}" failonerror="false" verbose="${verbose}" />
 	
-		<copy todir="${dir.build.target.output}" verbose="${verbose}">
+		<move todir="${dir.build.target.output}" verbose="${verbose}">
 			<fileset basedir="${dir.output}">
 				<include name="**.*" />
 			</fileset>
-		</copy>
+		</move>
+		
+		<delete dir="${dir.output}TestData" verbose="${verbose}" />
 		
 	</target>
 	
