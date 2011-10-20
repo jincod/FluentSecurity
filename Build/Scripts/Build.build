@@ -95,7 +95,7 @@
 				<include name="${dir.build}\Targets\**.*" />
 			</fileset>
 		</delete>
-		<sleep seconds="3" />
+		<sleep seconds="5" if="${directory::exists(dir.build+'\Targets\')}" />
 		<delete dir="${dir.build}\Targets\" verbose="${verbose}" />
 	
 		<foreach item="String" in="${product.mvc.targets}" delim="," property="mvc.target.name">
