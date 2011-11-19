@@ -23,8 +23,16 @@ namespace FluentSecurity.TestHelper.Expectations
 
 		protected override bool EvaluatePredicate(ISecurityPolicy securityPolicy)
 		{
-			var policy = securityPolicy as TSecurityPolicy;
+			var policyToEvaluate = GetPolicyToEvaluate(securityPolicy);
+			var policy = policyToEvaluate as TSecurityPolicy;
 			return policy != null && Predicate.Invoke(policy);
+		}
+
+		private static ISecurityPolicy GetPolicyToEvaluate(ISecurityPolicy securityPolicy)
+		{
+			return securityPolicy is ILazySecurityPolicy
+			       	? ((ILazySecurityPolicy)securityPolicy).Load()
+			       	: securityPolicy;
 		}
 
 		public override string GetPredicateDescription()

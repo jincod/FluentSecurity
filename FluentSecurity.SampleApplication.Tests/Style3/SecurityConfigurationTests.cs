@@ -39,6 +39,8 @@ namespace FluentSecurity.SampleApplication.Tests.Style3
 				expectations.Expect<AdminController>().Has<AdministratorPolicy>();
 				expectations.Expect<AdminController>(x => x.Delete()).Has<DelegatePolicy>(p => p.Name == "LocalOnlyPolicy");
 
+				expectations.Expect<AdminController>(x => x.Delete()).Has<DynamicDeletePolicy>(p => p.RolesThatAllowDelete == "Admin, Editor");
+
 				expectations.Expect<Areas.ExampleArea.Controllers.HomeController>(x => x.Index()).Has<DenyAnonymousAccessPolicy>();
 				expectations.Expect<Areas.ExampleArea.Controllers.HomeController>(x => x.AdministratorsOnly()).Has(new RequireRolePolicy(UserRole.Administrator));
 				expectations.Expect<Areas.ExampleArea.Controllers.HomeController>(x => x.PublishersOnly()).Has(new RequireRolePolicy(UserRole.Publisher));

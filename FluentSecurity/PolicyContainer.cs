@@ -6,6 +6,32 @@ using FluentSecurity.Policy;
 
 namespace FluentSecurity
 {
+	public interface ILazySecurityPolicy : ISecurityPolicy
+	{
+		Type PolicyType { get; }
+		ISecurityPolicy Load();
+	}
+
+	internal class LazyPolicy<TSecurityPolicy> : ILazySecurityPolicy
+	{
+		public Type PolicyType { get; private set; }
+		
+		public LazyPolicy()
+		{
+			PolicyType = typeof(TSecurityPolicy);
+		}
+
+		public ISecurityPolicy Load()
+		{
+			return (ISecurityPolicy) ServiceLocation.ServiceLocator.Current.Resolve<TSecurityPolicy>();
+		}
+
+		public PolicyResult Enforce(ISecurityContext context)
+		{
+			return Load().Enforce(context);
+		}
+	}
+
 	public class PolicyContainer : IPolicyContainer
 	{
 		private readonly IList<ISecurityPolicy> _policies;
@@ -58,6 +84,13 @@ namespace FluentSecurity
 			return this;
 		}
 
+		public IPolicyContainer ApplyPolicy<TSecurityPolicy>() where TSecurityPolicy : ISecurityPolicy
+		{
+			PolicyAppender.UpdatePolicies(new LazyPolicy<TSecurityPolicy>(), _policies);
+
+			return this;
+		}
+
 		public IPolicyContainer RemovePolicy<TSecurityPolicy>(Func<TSecurityPolicy, bool> predicate = null) where TSecurityPolicy : ISecurityPolicy
 		{
 			if (predicate == null)
@@ -67,8 +100,16 @@ namespace FluentSecurity
 				p is TSecurityPolicy &&
 				predicate.Invoke((TSecurityPolicy)p)
 				).ToList();
-			
+
 			foreach (var matchingPolicy in matchingPolicies)
+				_policies.Remove(matchingPolicy);
+
+			var matchingLazyPolicies = _policies.Where(p =>
+				p is ILazySecurityPolicy &&
+				((ILazySecurityPolicy)p).PolicyType == typeof(TSecurityPolicy)
+				).ToList();
+
+			foreach (var matchingPolicy in matchingLazyPolicies)
 				_policies.Remove(matchingPolicy);
 
 			return this;
