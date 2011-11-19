@@ -10,8 +10,9 @@ using FluentSecurity.ServiceLocation;
 
 namespace FluentSecurity
 {
-	public class ConfigurationExpression : Builder<IPolicyContainer>
+	public class ConfigurationExpression
 	{
+		protected internal List<IPolicyContainer> PolicyContainers { get; set; }
 		internal Func<bool> IsAuthenticated { get; private set; }
 		internal Func<IEnumerable<object>> Roles { get; private set; }
 		internal ISecurityServiceLocator ExternalServiceLocator { get; private set; }
@@ -20,6 +21,7 @@ namespace FluentSecurity
 
 		public ConfigurationExpression()
 		{
+			PolicyContainers = new List<IPolicyContainer>();
 			PolicyAppender = new DefaultPolicyAppender();
 		}
 
@@ -35,7 +37,7 @@ namespace FluentSecurity
 		{
 			IPolicyContainer policyContainer;
 
-			var existingContainer = _itemValues.GetContainerFor(controllerName, actionName);
+			var existingContainer = PolicyContainers.GetContainerFor(controllerName, actionName);
 			if (existingContainer != null)
 			{
 				policyContainer = existingContainer;
@@ -43,7 +45,7 @@ namespace FluentSecurity
 			else
 			{
 				policyContainer = new PolicyContainer(controllerName, actionName, PolicyAppender);
-				_itemValues.Add(policyContainer);
+				PolicyContainers.Add(policyContainer);
 			}
 
 			return policyContainer;
@@ -118,10 +120,10 @@ namespace FluentSecurity
 			var controllerName = typeof(TController).GetControllerName();
 			var actionName = actionExpression.GetActionName();
 
-			var policyContainer = _itemValues.GetContainerFor(controllerName, actionName);
+			var policyContainer = PolicyContainers.GetContainerFor(controllerName, actionName);
 			if (policyContainer != null)
 			{
-				_itemValues.Remove(policyContainer);
+				PolicyContainers.Remove(policyContainer);
 			}
 		}
 
@@ -138,7 +140,7 @@ namespace FluentSecurity
 			if (rolesFunction == null)
 				throw new ArgumentNullException("rolesFunction");
 
-			if (_itemValues.Count > 0)
+			if (PolicyContainers.Count > 0)
 				throw new ConfigurationErrorsException("You must set the rolesfunction before adding policies.");
 
 			Roles = rolesFunction;
@@ -171,6 +173,13 @@ namespace FluentSecurity
 				throw new ArgumentNullException("securityServiceLocator");
 
 			ExternalServiceLocator = securityServiceLocator;
+		}
+
+		public void ApplyProfile<TSecurityProfile>() where TSecurityProfile : SecurityProfile, new()
+		{
+			var profile = new TSecurityProfile();
+			profile.Initialize(PolicyContainers, PolicyAppender);
+			profile.Configure();
 		}
 	}
 }

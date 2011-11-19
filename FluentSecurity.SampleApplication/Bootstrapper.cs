@@ -33,8 +33,18 @@ namespace FluentSecurity.SampleApplication
 				configuration.For<Areas.ExampleArea.Controllers.HomeController>().DenyAnonymousAccess();
 				configuration.For<Areas.ExampleArea.Controllers.HomeController>(x => x.PublishersOnly()).RequireRole(UserRole.Publisher);
 				configuration.For<Areas.ExampleArea.Controllers.HomeController>(x => x.AdministratorsOnly()).RequireRole(UserRole.Administrator);
+
+				configuration.ApplyProfile<WebProfile>();
 			});
 			return SecurityConfiguration.Current;
+		}
+	}
+
+	public class WebProfile : SecurityProfile
+	{
+		public override void Configure()
+		{
+			//For<AdminController>().Ignore();
 		}
 	}
 }

@@ -16,7 +16,7 @@ namespace FluentSecurity
 
 			ExternalServiceLocator = Expression.ExternalServiceLocator;
 			IgnoreMissingConfiguration = Expression.ShouldIgnoreMissingConfiguration;
-			PolicyContainers = Expression;
+			PolicyContainers = Expression.PolicyContainers;
 		}
 
 		internal ConfigurationExpression Expression { get; private set; }

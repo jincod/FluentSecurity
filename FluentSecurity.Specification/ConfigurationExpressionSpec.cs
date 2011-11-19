@@ -26,7 +26,7 @@ namespace FluentSecurity.Specification
 			var configurationExpression = Because();
 
 			// Assert
-			var containers = configurationExpression.Count();
+			var containers = configurationExpression.PolicyContainers.Count();
 			Assert.That(containers, Is.EqualTo(0));
 		}
 
@@ -71,10 +71,10 @@ namespace FluentSecurity.Specification
 			Because();
 
 			// Assert
-			var policyContainer = _configurationExpression.GetContainerFor(NameHelper<BlogController>.Controller(), "Index");
+			var policyContainer = _configurationExpression.PolicyContainers.GetContainerFor(NameHelper<BlogController>.Controller(), "Index");
 			
 			Assert.That(policyContainer, Is.Not.Null);
-			Assert.That(_configurationExpression.ToList().Count, Is.EqualTo(1));
+			Assert.That(_configurationExpression.PolicyContainers.ToList().Count, Is.EqualTo(1));
 		}
 
 		[Test]
@@ -84,7 +84,7 @@ namespace FluentSecurity.Specification
 			Because();
 
 			// Assert
-			var policyContainer = _configurationExpression.GetContainerFor(NameHelper<BlogController>.Controller(), "Index");
+			var policyContainer = _configurationExpression.PolicyContainers.GetContainerFor(NameHelper<BlogController>.Controller(), "Index");
 			Assert.That(policyContainer.PolicyAppender, Is.TypeOf(typeof(DefaultPolicyAppender)));
 		}
 	}
@@ -104,9 +104,9 @@ namespace FluentSecurity.Specification
 			configurationExpression.For<BlogController>(x => x.AddPost());
 
 			// Assert
-			Assert.That(configurationExpression.GetContainerFor(NameHelper<BlogController>.Controller(), "Index"), Is.Not.Null);
-			Assert.That(configurationExpression.GetContainerFor(NameHelper<BlogController>.Controller(), "AddPost"), Is.Not.Null);
-			Assert.That(configurationExpression.ToList().Count, Is.EqualTo(2));
+			Assert.That(configurationExpression.PolicyContainers.GetContainerFor(NameHelper<BlogController>.Controller(), "Index"), Is.Not.Null);
+			Assert.That(configurationExpression.PolicyContainers.GetContainerFor(NameHelper<BlogController>.Controller(), "AddPost"), Is.Not.Null);
+			Assert.That(configurationExpression.PolicyContainers.ToList().Count, Is.EqualTo(2));
 		}
 	}
 
@@ -138,12 +138,12 @@ namespace FluentSecurity.Specification
 			Because();
 
 			// Assert
-			Assert.That(_configurationExpression.GetContainerFor(expectedControllerName, "Index"), Is.Not.Null);
-			Assert.That(_configurationExpression.GetContainerFor(expectedControllerName, "ListPosts"), Is.Not.Null);
-			Assert.That(_configurationExpression.GetContainerFor(expectedControllerName, "AddPost"), Is.Not.Null);
-			Assert.That(_configurationExpression.GetContainerFor(expectedControllerName, "EditPost"), Is.Not.Null);
-			Assert.That(_configurationExpression.GetContainerFor(expectedControllerName, "DeletePost"), Is.Not.Null);
-			Assert.That(_configurationExpression.GetContainerFor(expectedControllerName, "AjaxList"), Is.Not.Null);
+			Assert.That(_configurationExpression.PolicyContainers.GetContainerFor(expectedControllerName, "Index"), Is.Not.Null);
+			Assert.That(_configurationExpression.PolicyContainers.GetContainerFor(expectedControllerName, "ListPosts"), Is.Not.Null);
+			Assert.That(_configurationExpression.PolicyContainers.GetContainerFor(expectedControllerName, "AddPost"), Is.Not.Null);
+			Assert.That(_configurationExpression.PolicyContainers.GetContainerFor(expectedControllerName, "EditPost"), Is.Not.Null);
+			Assert.That(_configurationExpression.PolicyContainers.GetContainerFor(expectedControllerName, "DeletePost"), Is.Not.Null);
+			Assert.That(_configurationExpression.PolicyContainers.GetContainerFor(expectedControllerName, "AjaxList"), Is.Not.Null);
 		}
 
 		[Test]
@@ -153,7 +153,7 @@ namespace FluentSecurity.Specification
 			Because();
 
 			// Assert
-			Assert.That(_configurationExpression.ToList().Count, Is.EqualTo(6));
+			Assert.That(_configurationExpression.PolicyContainers.ToList().Count, Is.EqualTo(6));
 		}
 	}
 
@@ -272,7 +272,7 @@ namespace FluentSecurity.Specification
 			_configurationExpression.For<BlogController>(x => x.Index());
 			_configurationExpression.For<BlogController>(x => x.AddPost());
 
-			_addPostPolicyContainer = _configurationExpression.GetContainerFor(NameHelper<BlogController>.Controller(), "AddPost");
+			_addPostPolicyContainer = _configurationExpression.PolicyContainers.GetContainerFor(NameHelper<BlogController>.Controller(), "AddPost");
 
 			// Act
 			_configurationExpression.RemovePoliciesFor<BlogController>(x => x.AddPost());
@@ -282,28 +282,28 @@ namespace FluentSecurity.Specification
 		public void Should_have_1_policycontainer()
 		{
 			// Assert
-			Assert.That(_configurationExpression.ToList().Count, Is.EqualTo(1));
+			Assert.That(_configurationExpression.PolicyContainers.ToList().Count, Is.EqualTo(1));
 		}
 
 		[Test]
 		public void Should_have_policycontainer_for_Blog_Index()
 		{
 			// Assert
-			Assert.That(_configurationExpression.GetContainerFor(NameHelper<BlogController>.Controller(), "Index"), Is.Not.Null);
+			Assert.That(_configurationExpression.PolicyContainers.GetContainerFor(NameHelper<BlogController>.Controller(), "Index"), Is.Not.Null);
 		}
 
 		[Test]
 		public void Should_not_have_policycontainer_for_Blog_AddPost()
 		{
 			// Assert
-			Assert.That(_configurationExpression.Contains(_addPostPolicyContainer), Is.False);
+			Assert.That(_configurationExpression.PolicyContainers.Contains(_addPostPolicyContainer), Is.False);
 		}
 
 		[Test]
 		public void Shoud_return_null_when_getting_a_policycontainer_for_Blog_AddPost()
 		{
 			// Assert
-			Assert.That(_configurationExpression.GetContainerFor(NameHelper<BlogController>.Controller(), "AddPost"), Is.Null);
+			Assert.That(_configurationExpression.PolicyContainers.GetContainerFor(NameHelper<BlogController>.Controller(), "AddPost"), Is.Null);
 		}
 	}
 
@@ -400,7 +400,7 @@ namespace FluentSecurity.Specification
 
 			// Assert
 			configurationExpression.For<BlogController>(x => x.Index());
-			var policyContainer = configurationExpression.GetContainerFor(NameHelper<BlogController>.Controller(), "Index");
+			var policyContainer = configurationExpression.PolicyContainers.GetContainerFor(NameHelper<BlogController>.Controller(), "Index");
 			Assert.That(policyContainer.PolicyAppender, Is.EqualTo(expectedPolicyAppender));
 		}
 	}
