@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 
 namespace FluentSecurity.Scanning
 {
-	internal class AssemblyScanner
+	public class AssemblyScanner
 	{
 		private readonly List<Assembly> _assemblies = new List<Assembly>();
-		private readonly List<ITypeScanner> _scanners = new List<ITypeScanner>();
-		private readonly IList<Func<Type, bool>> _filters = new List<Func<Type, bool>>();
+		private readonly CompositeFilter<Type> _typeFilters = new CompositeFilter<Type>();
+		private readonly List<IScannerConvention> _conventions = new List<IScannerConvention>();
 
 		public void Assembly(Assembly assembly)
 		{
@@ -43,14 +42,14 @@ namespace FluentSecurity.Scanning
 			return callingAssembly;
 		}
 
-		public void With(ITypeScanner typeScanner)
+		public void With(IScannerConvention convention)
 		{
-			_scanners.Add(typeScanner);
+			_conventions.Add(convention);
 		}
 
-		public void With<TTypeScanner>() where TTypeScanner : ITypeScanner, new()
+		public void With<TConvention>() where TConvention : IScannerConvention, new()
 		{
-			With(new TTypeScanner());
+			With(new TConvention());
 		}
 
 		public void IncludeNamespaceContainingType<T>()
@@ -58,19 +57,22 @@ namespace FluentSecurity.Scanning
 			Func<Type, bool> predicate = type =>
 			{
 				var currentNamespace = type.Namespace ?? "";
-				var expectedNamespace = typeof (T).Namespace ?? "";
+				var expectedNamespace = typeof(T).Namespace ?? "";
 				return currentNamespace.StartsWith(expectedNamespace);
 			};
-			_filters.Add(predicate);
+
+			_typeFilters.Includes.Add(predicate);
 		}
 
-		public IEnumerable<Type> Scan()
+		public ScannerRegistry Scan(ScannerContext context)
 		{
-			var results = new List<Type>();
-			_scanners.Each(scanner => scanner.Scan(_assemblies).Where(type =>
-				_filters.Any() == false || _filters.Any(filter => filter.Invoke(type))).Each(results.Add)
+			var registry = new ScannerRegistry();
+			
+			context.Types.For(_assemblies, _typeFilters).Each(type =>
+				_conventions.Each(c => c.Process(type, context, registry))
 				);
-			return results;
+
+			return registry;
 		}
 	}
 }

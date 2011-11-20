@@ -10,7 +10,7 @@ namespace FluentSecurity
 			if (configurationExpression == null)
 				throw new ArgumentNullException("configurationExpression");
 
-			var expression = new ConfigurationExpression();
+			var expression = new RootConfigurationExpression();
 			configurationExpression(expression);
 			Expression = expression;
 

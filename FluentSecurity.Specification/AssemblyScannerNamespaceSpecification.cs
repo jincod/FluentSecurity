@@ -12,6 +12,7 @@ namespace FluentSecurity.Specification
 			// Arrange
 			PolicyContainers = Enumerable.Empty<IPolicyContainer>();
 			var expression = TestDataFactory.CreateValidConfigurationExpression();
+			expression.CreateContext(new RootConfigurationExpression());
 			configurationExpression(expression);
 			PolicyContainers = expression.PolicyContainers.ToList();
 		}

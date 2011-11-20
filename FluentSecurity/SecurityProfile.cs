@@ -1,13 +1,25 @@
-using System.Collections.Generic;
+using FluentSecurity.Scanning;
 
 namespace FluentSecurity
 {
+	public class RootConfigurationExpression : ConfigurationExpression
+	{
+		public RootConfigurationExpression()
+		{
+			CreateContext(this);
+		}
+	}
+
 	public abstract class SecurityProfile : ConfigurationExpression
 	{
-		internal void Initialize(List<IPolicyContainer> policyContainers, IPolicyAppender policyAppender)
+		internal virtual void Initialize(ScannerContext context, IPolicyAppender policyAppender)
 		{
-			PolicyContainers = policyContainers;
+			SetContext(context);
 			SetPolicyAppender(policyAppender);
+
+			Context.BeginProfileImport(GetType());
+			Configure();
+			Context.EndProfileImport(GetType());
 		}
 
 		public abstract void Configure();

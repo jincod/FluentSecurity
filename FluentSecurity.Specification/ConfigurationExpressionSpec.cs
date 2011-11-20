@@ -242,9 +242,7 @@ namespace FluentSecurity.Specification
 		{
 			// Arrange
 			const string index = "Index";
-			var root = NameHelper<TestData.AssemblyScannerControllers.RootController>.Controller();
 			var include = NameHelper<TestData.AssemblyScannerControllers.Include.IncludedController>.Controller();
-			var exclude = NameHelper<TestData.AssemblyScannerControllers.Exclude.ExcludedController>.Controller();
 
 			// Act
 			Because(configurationExpression =>

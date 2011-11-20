@@ -12,17 +12,31 @@ namespace FluentSecurity
 {
 	public class ConfigurationExpression
 	{
-		protected internal List<IPolicyContainer> PolicyContainers { get; set; }
+		internal ScannerContext Context { get; private set; }
+		internal IPolicyAppender PolicyAppender { get; private set; }
+		internal List<IPolicyContainer> PolicyContainers { get; private set; }
 		internal Func<bool> IsAuthenticated { get; private set; }
 		internal Func<IEnumerable<object>> Roles { get; private set; }
 		internal ISecurityServiceLocator ExternalServiceLocator { get; private set; }
 		internal bool ShouldIgnoreMissingConfiguration { get; private set; }
-		private IPolicyAppender PolicyAppender { get; set; }
 
-		public ConfigurationExpression()
+		internal ConfigurationExpression()
 		{
+			Context = null;
 			PolicyContainers = new List<IPolicyContainer>();
 			PolicyAppender = new DefaultPolicyAppender();
+		}
+
+		internal void CreateContext(RootConfigurationExpression rootConfigurationExpression)
+		{
+			Context = new ScannerContext(rootConfigurationExpression);
+			PolicyContainers = new List<IPolicyContainer>();
+		}
+
+		protected internal void SetContext(ScannerContext context)
+		{
+			Context = context;
+			PolicyContainers = context.Configuration.PolicyContainers;
 		}
 
 		public IPolicyContainer For<TController>(Expression<Func<TController, object>> propertyExpression) where TController : Controller
@@ -63,8 +77,8 @@ namespace FluentSecurity
 		{
 			var assemblyScanner = new AssemblyScanner();
 			assemblyScanner.TheCallingAssembly();
-			assemblyScanner.With<ControllerTypeScanner>();
-			var controllerTypes = assemblyScanner.Scan();
+			assemblyScanner.With<ControllerTypeFilterConvention>();
+			var controllerTypes = assemblyScanner.Scan(Context).GetRegisteredTypes();
 
 			return CreateConventionPolicyContainerFor(controllerTypes);
 		}
@@ -73,8 +87,8 @@ namespace FluentSecurity
 		{
 			var assemblyScanner = new AssemblyScanner();
 			assemblyScanner.Assembly(assembly);
-			assemblyScanner.With<ControllerTypeScanner>();
-			var controllerTypes = assemblyScanner.Scan();
+			assemblyScanner.With<ControllerTypeFilterConvention>();
+			var controllerTypes = assemblyScanner.Scan(Context).GetRegisteredTypes();
 
 			return CreateConventionPolicyContainerFor(controllerTypes);
 		}
@@ -91,9 +105,9 @@ namespace FluentSecurity
 
 			var assemblyScanner = new AssemblyScanner();
 			assemblyScanner.Assembly(assembly);
-			assemblyScanner.With<ControllerTypeScanner>();
+			assemblyScanner.With<ControllerTypeFilterConvention>();
 			assemblyScanner.IncludeNamespaceContainingType<TType>();
-			var controllerTypes = assemblyScanner.Scan();
+			var controllerTypes = assemblyScanner.Scan(Context).GetRegisteredTypes();
 
 			return CreateConventionPolicyContainerFor(controllerTypes);
 		}
@@ -112,6 +126,13 @@ namespace FluentSecurity
 			}
 
 			return new ConventionPolicyContainer(policyContainers);
+		}
+
+		public void Scan(Action<AssemblyScanner> action)
+		{
+			var assemblyScanner = new AssemblyScanner();
+			action.Invoke(assemblyScanner);
+			assemblyScanner.Scan(Context);
 		}
 
 		[Obsolete("Will be removed for the 2.0 release")]
@@ -177,9 +198,21 @@ namespace FluentSecurity
 
 		public void ApplyProfile<TSecurityProfile>() where TSecurityProfile : SecurityProfile, new()
 		{
-			var profile = new TSecurityProfile();
-			profile.Initialize(PolicyContainers, PolicyAppender);
-			profile.Configure();
+			ApplyProfileIfNew(new TSecurityProfile());
+		}
+
+		public void ApplyProfile(SecurityProfile profile)
+		{
+			ApplyProfileIfNew(profile);
+		}
+
+		private void ApplyProfileIfNew(SecurityProfile profile)
+		{
+			var profileType = profile.GetType();
+			if (Context.ContainsProfile(profileType))
+				return;
+
+			profile.Initialize(Context, PolicyAppender);
 		}
 	}
 }

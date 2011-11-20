@@ -12,6 +12,7 @@ namespace FluentSecurity.Specification
 		{
 			// Arrange
 			var expression = TestDataFactory.CreateValidConfigurationExpression();
+			expression.CreateContext(new RootConfigurationExpression());
 			configurationExpression(expression);
 			AssertAllControllerActionsHasContainer(expression);
 		}
