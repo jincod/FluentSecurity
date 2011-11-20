@@ -1,17 +1,19 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Routing;
 
 namespace FluentSecurity.SampleApplication.Helpers
 {
 	public static class SecurityHelper
 	{
-		public static bool ActionIsAllowedForUser(string controllerName, string actionName)
+		public static bool ActionIsAllowedForUser(string controllerName, string actionName, RouteValueDictionary routeValueDictionary)
 		{
 			var configuration = SecurityConfiguration.Current; 
 			var policyContainer = configuration.PolicyContainers.GetContainerFor(controllerName, actionName);
 			if (policyContainer != null)
 			{
 				var context = SecurityContext.Current;
+				context.RegisterData(routeValueDictionary);
 				var results = policyContainer.EnforcePolicies(context);
 				return results.All(x => x.ViolationOccured == false);
 			}

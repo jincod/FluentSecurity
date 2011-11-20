@@ -23,5 +23,10 @@ namespace FluentSecurity.SampleApplication.Controllers
     	{
     		return View();
     	}
+
+		public ActionResult Test(int id)
+		{
+			return View();
+		}
     }
 }

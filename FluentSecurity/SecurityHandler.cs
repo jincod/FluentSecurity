@@ -1,13 +1,14 @@
 using System;
 using System.Linq;
 using System.Web.Mvc;
+using System.Web.Routing;
 using FluentSecurity.ServiceLocation;
 
 namespace FluentSecurity
 {
 	public class SecurityHandler : ISecurityHandler
 	{
-		public ActionResult HandleSecurityFor(string controllerName, string actionName)
+		public ActionResult HandleSecurityFor(string controllerName, string actionName, RouteValueDictionary routeValueDictionary = null)
 		{
 			if (controllerName.IsNullOrEmpty())
 				throw new ArgumentException("Controllername must not be null or empty", "controllerName");
@@ -20,7 +21,8 @@ namespace FluentSecurity
 			var policyContainer = configuration.PolicyContainers.GetContainerFor(controllerName, actionName);
 			if (policyContainer != null)
 			{
-				var context = ServiceLocator.Current.Resolve<ISecurityContext>();
+				var context = SecurityContext.Current;
+				context.RegisterData(routeValueDictionary);
 				var results = policyContainer.EnforcePolicies(context);
 				if (results.Any(x => x.ViolationOccured))
 				{

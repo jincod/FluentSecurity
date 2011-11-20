@@ -16,28 +16,29 @@ namespace FluentSecurity.SampleApplication.Helpers
 		{
 			var fullControllerName = typeof(TController).GetFullControllerName();
 			var actionName = actionExpression.GetActionName();
+			var routeValueDictionary = new RouteValueDictionary(values);
 
-			if (SecurityHelper.ActionIsAllowedForUser(fullControllerName, actionName) == false)
+			if (SecurityHelper.ActionIsAllowedForUser(fullControllerName, actionName, routeValueDictionary) == false)
 			{
 				return string.Empty;
 			}
 
 			var controllerName = typeof(TController).GetControllerName();
-			return urlHelper.Action(actionName, controllerName, values);
+			return urlHelper.Action(actionName, controllerName, routeValueDictionary);
 		}
 
 		public static string AreaAction<TController>(this UrlHelper urlHelper, Expression<Func<TController, object>> actionExpression, string areaName) where TController : Controller
 		{
 			var fullControllerName = typeof(TController).GetFullControllerName();
 			var actionName = actionExpression.GetActionName();
+			var routeValueDictionary = new RouteValueDictionary { { "area", areaName } };
 
-			if (SecurityHelper.ActionIsAllowedForUser(fullControllerName, actionName) == false)
+			if (SecurityHelper.ActionIsAllowedForUser(fullControllerName, actionName, routeValueDictionary) == false)
 			{
 				return string.Empty;
 			}
 
 			var controllerName = typeof(TController).GetControllerName();
-			var routeValueDictionary = new RouteValueDictionary { { "area", areaName } };
 			return urlHelper.Action(actionName, controllerName, routeValueDictionary);
 		}
 	}

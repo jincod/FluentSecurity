@@ -11,6 +11,16 @@ namespace FluentSecurity
 			_securityContext = securityContext;
 		}
 
+		public T Data<T>() where T : class
+		{
+			return _securityContext.Data<T>();
+		}
+
+		public void RegisterData<T>(T instance) where T : class
+		{
+			_securityContext.RegisterData(instance);
+		}
+
 		public bool CurrenUserAuthenticated()
 		{
 			return _securityContext.CurrenUserAuthenticated();

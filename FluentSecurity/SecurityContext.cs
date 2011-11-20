@@ -7,13 +7,30 @@ namespace FluentSecurity
 {
 	public class SecurityContext : ISecurityContext
 	{
+		private readonly Dictionary<Type, object> _data;
 		private readonly Func<bool> _isAuthenticated;
 		private readonly Func<IEnumerable<object>> _roles;
 
 		private SecurityContext(Func<bool> isAuthenticated, Func<IEnumerable<object>> roles)
 		{
+			_data = new Dictionary<Type, object>();
 			_isAuthenticated = isAuthenticated;
 			_roles = roles;
+		}
+
+		public T Data<T>() where T : class
+		{
+			var key = typeof (T);
+			return _data.ContainsKey(key) ? _data[key] as T : null;
+		}
+
+		public void RegisterData<T>(T instance) where T : class
+		{
+			var key = typeof(T);
+			if (_data.ContainsKey(key))
+				throw new ArgumentException(String.Concat("An instance of {0} already exists in the data dictionary.", key.Name), "instance");
+			
+			_data.Add(key, instance);
 		}
 
 		public bool CurrenUserAuthenticated()
