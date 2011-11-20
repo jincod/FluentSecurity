@@ -22,9 +22,9 @@
 	<h3>Area examples</h3>
 	<p>Log in to see all the actions available</p>
 	<ul>
-		<%= Html.NavigationLink(Url.AreaAction<FluentSecurity.SampleApplication.Areas.ExampleArea.Controllers.HomeController>(x => x.Index(), "ExampleArea"), "Index", "li") %>
-		<%= Html.NavigationLink(Url.AreaAction<FluentSecurity.SampleApplication.Areas.ExampleArea.Controllers.HomeController>(x => x.PublishersOnly(), "ExampleArea"), "Publishers only", "li") %>
-		<%= Html.NavigationLink(Url.AreaAction<FluentSecurity.SampleApplication.Areas.ExampleArea.Controllers.HomeController>(x => x.AdministratorsOnly(), "ExampleArea"), "Administrators only", "li") %>
+		<%= Html.NavigationLink(Url.AreaAction<FluentSecurity.SampleApplication.Areas.InternalArea.Controllers.HomeController>(x => x.Index(), "ExampleArea"), "Index", "li") %>
+		<%= Html.NavigationLink(Url.AreaAction<FluentSecurity.SampleApplication.Areas.InternalArea.Controllers.HomeController>(x => x.PublishersOnly(), "ExampleArea"), "Publishers only", "li") %>
+		<%= Html.NavigationLink(Url.AreaAction<FluentSecurity.SampleApplication.Areas.InternalArea.Controllers.HomeController>(x => x.AdministratorsOnly(), "ExampleArea"), "Administrators only", "li") %>
 	</ul>
 	
 	<h2>What do I have</h2>

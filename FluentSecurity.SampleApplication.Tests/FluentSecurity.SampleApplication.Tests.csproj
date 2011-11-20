@@ -106,6 +106,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FluentSecurity.SampleApplication.ExternalArea\FluentSecurity.SampleApplication.ExternalArea.csproj">
+      <Project>{2DEC0F96-E04F-4D3F-A81D-2C40CB96419D}</Project>
+      <Name>FluentSecurity.SampleApplication.ExternalArea</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FluentSecurity.SampleApplication\FluentSecurity.SampleApplication.csproj">
       <Project>{C061FCA0-BF28-4803-B55B-F8725DAF3EA1}</Project>
       <Name>FluentSecurity.SampleApplication</Name>

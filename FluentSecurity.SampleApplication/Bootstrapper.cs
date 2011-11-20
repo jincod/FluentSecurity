@@ -14,11 +14,9 @@ namespace FluentSecurity.SampleApplication
 				configuration.GetAuthenticationStatusFrom(Helpers.SecurityHelper.UserIsAuthenticated);
 				configuration.GetRolesFrom(Helpers.SecurityHelper.UserRoles);
 
-				// TODO: Test with external area and see how it feels
-
 				configuration.Scan(x =>
 				{
-					x.TheCallingAssembly();
+					x.AssembliesFromApplicationBaseDirectory();
 					x.LookForProfiles();
 				});
 			});
@@ -53,13 +51,13 @@ namespace FluentSecurity.SampleApplication
 		}
 	}
 
-	public class AreaProfile : SecurityProfile
+	public class InternalAreaProfile : SecurityProfile
 	{
 		public override void Configure()
 		{
-			For<Areas.ExampleArea.Controllers.HomeController>().DenyAnonymousAccess();
-			For<Areas.ExampleArea.Controllers.HomeController>(x => x.PublishersOnly()).RequireRole(UserRole.Publisher);
-			For<Areas.ExampleArea.Controllers.HomeController>(x => x.AdministratorsOnly()).RequireRole(UserRole.Administrator);
+			For<Areas.InternalArea.Controllers.HomeController>().DenyAnonymousAccess();
+			For<Areas.InternalArea.Controllers.HomeController>(x => x.PublishersOnly()).RequireRole(UserRole.Publisher);
+			For<Areas.InternalArea.Controllers.HomeController>(x => x.AdministratorsOnly()).RequireRole(UserRole.Administrator);
 			
 			Scan(x =>
 			{

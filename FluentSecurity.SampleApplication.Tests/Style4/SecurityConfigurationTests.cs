@@ -35,9 +35,12 @@ namespace FluentSecurity.SampleApplication.Tests.Style4
 			expectations.For<AdminController>().Has<AdministratorPolicy>();
 			expectations.For<AdminController>(x => x.Delete()).Has<DelegatePolicy>(p => p.Name == "LocalOnlyPolicy");
 
-			expectations.For<Areas.ExampleArea.Controllers.HomeController>(x => x.Index()).Has<DenyAnonymousAccessPolicy>();
-			expectations.For<Areas.ExampleArea.Controllers.HomeController>(x => x.AdministratorsOnly()).Has(new RequireRolePolicy(UserRole.Administrator));
-			expectations.For<Areas.ExampleArea.Controllers.HomeController>(x => x.PublishersOnly()).Has(new RequireRolePolicy(UserRole.Publisher));
+			expectations.For<Areas.InternalArea.Controllers.HomeController>(x => x.Index()).Has<DenyAnonymousAccessPolicy>();
+			expectations.For<Areas.InternalArea.Controllers.HomeController>(x => x.AdministratorsOnly()).Has(new RequireRolePolicy(UserRole.Administrator));
+			expectations.For<Areas.InternalArea.Controllers.HomeController>(x => x.PublishersOnly()).Has(new RequireRolePolicy(UserRole.Publisher));
+
+			expectations.For<ExternalArea.Controllers.HomeController>().Has<DenyAnonymousAccessPolicy>();
+			expectations.For<ExternalArea.Controllers.AdminController>().Has<DenyAnonymousAccessPolicy>();
 
 			var results = expectations.VerifyAll(Bootstrapper.SetupFluentSecurity());
 

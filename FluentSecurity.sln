@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentSecurity.SampleApplic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentSecurity.SampleApplication.Tests", "FluentSecurity.SampleApplication.Tests\FluentSecurity.SampleApplication.Tests.csproj", "{56EB339E-9C71-4374-B8DF-5B7AC80DC97A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentSecurity.SampleApplication.ExternalArea", "FluentSecurity.SampleApplication.ExternalArea\FluentSecurity.SampleApplication.ExternalArea.csproj", "{2DEC0F96-E04F-4D3F-A81D-2C40CB96419D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{56EB339E-9C71-4374-B8DF-5B7AC80DC97A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56EB339E-9C71-4374-B8DF-5B7AC80DC97A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56EB339E-9C71-4374-B8DF-5B7AC80DC97A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DEC0F96-E04F-4D3F-A81D-2C40CB96419D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DEC0F96-E04F-4D3F-A81D-2C40CB96419D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DEC0F96-E04F-4D3F-A81D-2C40CB96419D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DEC0F96-E04F-4D3F-A81D-2C40CB96419D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,5 +58,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C061FCA0-BF28-4803-B55B-F8725DAF3EA1} = {635F70A6-95DD-47D6-B815-BF7D8592D9CB}
 		{56EB339E-9C71-4374-B8DF-5B7AC80DC97A} = {635F70A6-95DD-47D6-B815-BF7D8592D9CB}
+		{2DEC0F96-E04F-4D3F-A81D-2C40CB96419D} = {635F70A6-95DD-47D6-B815-BF7D8592D9CB}
 	EndGlobalSection
 EndGlobal

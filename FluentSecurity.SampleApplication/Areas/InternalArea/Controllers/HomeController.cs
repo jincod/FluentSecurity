@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace FluentSecurity.SampleApplication.Areas.ExampleArea.Controllers
+namespace FluentSecurity.SampleApplication.Areas.InternalArea.Controllers
 {
 	public class HomeController : Controller
 	{

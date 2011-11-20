@@ -2,18 +2,18 @@
 
 namespace FluentSecurity.SampleApplication.Areas.ExampleArea
 {
-	public class ExampleAreaAreaRegistration : AreaRegistration
+	public class InternalAreaAreaRegistration : AreaRegistration
 	{
 		public override string AreaName
 		{
-			get { return "ExampleArea"; }
+			get { return "InternalArea"; }
 		}
 
 		public override void RegisterArea(AreaRegistrationContext context)
 		{
 			context.MapRoute(
-				"ExampleArea_default",
-				"ExampleArea/{controller}/{action}/{id}",
+				"InternalArea_default",
+				"InternalArea/{controller}/{action}/{id}",
 				new { action = "Index", id = UrlParameter.Optional }
 				);
 		}

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace FluentSecurity.Scanning
@@ -15,6 +17,50 @@ namespace FluentSecurity.Scanning
 		{
 			if (assembly == null) throw new ArgumentNullException("assembly");
 			_assemblies.Add(assembly);
+		}
+
+		public void AssembliesFromApplicationBaseDirectory()
+		{
+			AssembliesFromApplicationBaseDirectory(a => true);
+		}
+
+		public void AssembliesFromApplicationBaseDirectory(Predicate<Assembly> assemblyFilter)
+		{
+			var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+			AssembliesFromPath(baseDirectory, assemblyFilter);
+			
+			var binPath = AppDomain.CurrentDomain.SetupInformation.PrivateBinPath;
+			if (Directory.Exists(binPath))
+				AssembliesFromPath(binPath, assemblyFilter);
+		}
+
+		public void AssembliesFromPath(string path)
+		{
+			AssembliesFromPath(path, a => true);
+		}
+
+		public void AssembliesFromPath(string path, Predicate<Assembly> assemblyFilter)
+		{
+			var assemblyPaths = Directory.GetFiles(path).Where(file =>
+			{
+				var extension = Path.GetExtension(file);
+				return extension != null && (
+					extension.Equals(".exe", StringComparison.OrdinalIgnoreCase) ||
+					extension.Equals(".dll", StringComparison.OrdinalIgnoreCase)
+					);
+			});
+
+			foreach (var assemblyPath in assemblyPaths)
+			{
+				Assembly assembly = null;
+				try
+				{
+					assembly = System.Reflection.Assembly.LoadFrom(assemblyPath);
+				}
+				catch {}
+				if (assembly != null && assemblyFilter(assembly)) Assembly(assembly);
+			}
 		}
 
 		public void TheCallingAssembly()
