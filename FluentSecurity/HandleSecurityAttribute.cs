@@ -22,7 +22,10 @@ namespace FluentSecurity
 			var controllerName = filterContext.ActionDescriptor.ControllerDescriptor.ControllerType.FullName;
 			var routeValueDictionary = filterContext.RouteData.Values;
 
-			var overrideResult = SecurityHandler.HandleSecurityFor(controllerName, actionName, routeValueDictionary);
+			var securityContext = SecurityContext.Current;
+			securityContext.Data.Set(routeValueDictionary);
+
+			var overrideResult = SecurityHandler.HandleSecurityFor(controllerName, actionName, securityContext);
 			if (overrideResult != null) filterContext.Result = overrideResult;
 		}
 	}
