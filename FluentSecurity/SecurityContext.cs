@@ -12,7 +12,7 @@ namespace FluentSecurity
 
 		private SecurityContext(Func<bool> isAuthenticated, Func<IEnumerable<object>> roles)
 		{
-			Data = new SecurityContextData();
+			Data = SecurityContextData.Create();
 
 			_isAuthenticated = isAuthenticated;
 			_roles = roles;

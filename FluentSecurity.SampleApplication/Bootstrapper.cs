@@ -12,6 +12,12 @@ namespace FluentSecurity.SampleApplication
 		public static ISecurityConfiguration SetupFluentSecurity()
 		{
 			SecurityContextFactory.BuildContextUsing(innerContext => new CustomSecurityContext(new GenericPrincipal(new GenericIdentity("Kristoffer"), null), innerContext));
+			
+			SecurityContextData.BuildUsing(data =>
+			{
+				data.Set(HttpContext.Current.Request.AcceptTypes, "AcceptTypes");
+				data.Set(HttpContext.Current.Server.MachineName, "MachineName");
+			});
 
 			SecurityConfigurator.Configure(configuration =>
 			{

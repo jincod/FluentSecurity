@@ -5,21 +5,43 @@ namespace FluentSecurity
 {
 	public class SecurityContextData
 	{
-		private readonly Dictionary<Type, object> _data = new Dictionary<Type, object>();
+		private readonly Dictionary<string, object> _data = new Dictionary<string, object>();
 
-		public T Get<T>() where T : class
+		public T Get<T>(string uniqueKey = null) where T : class
 		{
-			var key = typeof(T);
-			return _data.ContainsKey(key) ? _data[key] as T : null;
+			var key = uniqueKey ?? "";
+			
+			var instance = _data.ContainsKey(key) ? _data[key] as T : null;
+			if (instance == null)
+			{
+				key = typeof(T).Name;
+				instance = _data.ContainsKey(key) ? _data[key] as T : null;
+			}
+			
+			return instance;
 		}
 
-		public void Set<T>(T instance, bool replaceIfExists = false) where T : class
+		public void Set<T>(T instance, string uniqueKey = null, bool replaceIfExists = false) where T : class
 		{
-			var key = typeof(T);
+			var key = uniqueKey ?? typeof(T).Name;
 			if (_data.ContainsKey(key) && replaceIfExists == false)
-				throw new ArgumentException(String.Concat("An instance of {0} already exists in the data dictionary.", key.Name), "instance");
+				throw new ArgumentException(String.Concat("An instance of {0} with the key {1} already exists in the data dictionary.", typeof(T).Name, key), "instance");
 
 			_data.Add(key, instance);
-		}	 
+		}
+
+		private static Action<SecurityContextData> _buildAction = context => {};
+
+		public static void BuildUsing(Action<SecurityContextData> buildAction)
+		{
+			_buildAction = buildAction;
+		}
+
+		public static SecurityContextData Create()
+		{
+			var instance = new SecurityContextData();
+			_buildAction.Invoke(instance);
+			return instance;
+		}
 	}
 }
