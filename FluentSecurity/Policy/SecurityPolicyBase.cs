@@ -1,13 +1,10 @@
-using System;
-
 namespace FluentSecurity.Policy
 {
-	public abstract class SecurityPolicyBase<TSecurityContext> : ISecurityPolicy where TSecurityContext : class
+	public abstract class SecurityPolicyBase<TSecurityContext> : ISecurityPolicy where TSecurityContext : class, ISecurityContext
 	{
 		public PolicyResult Enforce(ISecurityContext context)
 		{
-			var contextType = typeof(TSecurityContext);
-			var customContext = (TSecurityContext)Activator.CreateInstance(contextType, context);
+			var customContext = SecurityContextFactory.CreateContext<TSecurityContext>(context);
 			return Enforce(customContext);
 		}
 

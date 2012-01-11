@@ -28,7 +28,10 @@
 	</ul>
 
 	<h3>Example of route value based policy</h3>
-	<p><%= Html.NavigationLink(Url.Action<AdminController>(x => x.Test(0), new { id = 5 }), "Test") %></p>
+	<p><%= Html.NavigationLink(Url.Action<AdminController>(x => x.ContextWithRouteValues(0), new { id = 38 }), "Test") %></p>
+
+	<h3>Example of custom context based policy</h3>
+	<p><%= Html.NavigationLink(Url.Action<AdminController>(x => x.CustomContext(0), new { id = 5 }), "Test") %></p>
 	
 	<h2>What do I have</h2>
 	<pre><%= Model.WhatDoIHave %></pre>

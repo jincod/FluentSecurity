@@ -24,9 +24,14 @@ namespace FluentSecurity.SampleApplication.Controllers
     		return View();
     	}
 
-		public ActionResult Test(int id)
+		public ActionResult ContextWithRouteValues(int id)
 		{
 			return View();
 		}
+
+    	public ActionResult CustomContext(int id)
+    	{
+			return View();
+    	}
     }
 }

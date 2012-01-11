@@ -4,8 +4,7 @@ namespace FluentSecurity
 {
 	public interface ISecurityContext
 	{
-		T Data<T>() where T : class;
-		void RegisterData<T>(T instance) where T : class;
+		SecurityContextData Data { get; }
 		bool CurrenUserAuthenticated();
 		IEnumerable<object> CurrenUserRoles();
 	}

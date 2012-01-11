@@ -11,6 +11,8 @@ namespace FluentSecurity.SampleApplication
 	{
 		public static ISecurityConfiguration SetupFluentSecurity()
 		{
+			SecurityContextFactory.BuildContextUsing(innerContext => new CustomSecurityContext(new GenericPrincipal(new GenericIdentity("Kristoffer"), null), innerContext));
+
 			SecurityConfigurator.Configure(configuration =>
 			{
 				configuration.GetAuthenticationStatusFrom(Helpers.SecurityHelper.UserIsAuthenticated);
@@ -33,7 +35,9 @@ namespace FluentSecurity.SampleApplication
 					context => HttpContext.Current.Request.IsLocal
 					);
 
-				configuration.For<AdminController>(x => x.Test(0)).Ignore().AddPolicy(new RouteInfoPolicy());
+				configuration.For<AdminController>(x => x.ContextWithRouteValues(0)).Ignore().AddPolicy(new RouteInfoPolicy());
+
+				configuration.For<AdminController>(x => x.CustomContext(0)).Ignore().AddPolicy(new CustomContextPolicy());
 
 				configuration.For<Areas.ExampleArea.Controllers.HomeController>().DenyAnonymousAccess();
 				configuration.For<Areas.ExampleArea.Controllers.HomeController>(x => x.PublishersOnly()).RequireRole(UserRole.Publisher);
@@ -47,20 +51,20 @@ namespace FluentSecurity.SampleApplication
 	{
 		public PolicyResult Enforce(ISecurityContext context)
 		{
-			var routeValues = context.Data<RouteValueDictionary>();
+			var routeValues = context.Data.Get<RouteValueDictionary>();
 			var id = routeValues["id"] != null ? int.Parse(routeValues["id"].ToString()) : 0;
 			
-			return id == 38
-				? PolicyResult.CreateFailureResult(this, "Number was 38")
+			return id != 38
+				? PolicyResult.CreateFailureResult(this, "Number was not 38")
 				: PolicyResult.CreateSuccessResult(this);
 		}
 	}
 
-	public class CustomPolicy : SecurityPolicyBase<CustomSecurityContext>
+	public class CustomContextPolicy : SecurityPolicyBase<CustomSecurityContext>
 	{
 		public override PolicyResult Enforce(CustomSecurityContext context)
 		{
-			return context.Principal.Identity.Name == "Kristoffer" && context.CustomData == "ABC"
+			return context.Principal.Identity.Name == "Kristoffer" && context.CustomData == "ABC" && context.Id == 38
 				? PolicyResult.CreateFailureResult(this, "Access denied")
 				: PolicyResult.CreateSuccessResult(this);
 		}
@@ -70,11 +74,16 @@ namespace FluentSecurity.SampleApplication
 	{
 		public IPrincipal Principal { get; private set; }
 		public string CustomData { get; private set; }
+		public int Id { get; set; }
 
-		public CustomSecurityContext(IPrincipal principal, ISecurityContext securityContext) : base(securityContext)
+		public CustomSecurityContext(IPrincipal principal, ISecurityContext innerSecurityContext) : base(innerSecurityContext)
 		{
+			var routeValues = Data.Get<RouteValueDictionary>();
+			var id = routeValues["id"] != null ? int.Parse(routeValues["id"].ToString()) : 0;
+
 			Principal = principal;
 			CustomData = "ABC";
+			Id = id;
 		}
 	}
 }

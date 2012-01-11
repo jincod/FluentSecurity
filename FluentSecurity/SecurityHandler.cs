@@ -22,7 +22,7 @@ namespace FluentSecurity
 			if (policyContainer != null)
 			{
 				var context = SecurityContext.Current;
-				context.RegisterData(routeValueDictionary);
+				context.Data.Set(routeValueDictionary);
 				var results = policyContainer.EnforcePolicies(context);
 				if (results.Any(x => x.ViolationOccured))
 				{

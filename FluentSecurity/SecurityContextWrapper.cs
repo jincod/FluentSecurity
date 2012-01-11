@@ -6,19 +6,14 @@ namespace FluentSecurity
 	{
 		private readonly ISecurityContext _securityContext;
 
-		public SecurityContextWrapper(ISecurityContext securityContext)
+		public SecurityContextWrapper(ISecurityContext innerSecurityContext)
 		{
-			_securityContext = securityContext;
+			_securityContext = innerSecurityContext;
 		}
-
-		public T Data<T>() where T : class
+		
+		public SecurityContextData Data
 		{
-			return _securityContext.Data<T>();
-		}
-
-		public void RegisterData<T>(T instance) where T : class
-		{
-			_securityContext.RegisterData(instance);
+			get { return _securityContext.Data; }
 		}
 
 		public bool CurrenUserAuthenticated()
