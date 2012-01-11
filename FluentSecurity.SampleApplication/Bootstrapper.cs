@@ -13,10 +13,10 @@ namespace FluentSecurity.SampleApplication
 		{
 			SecurityContextFactory.BuildContextUsing(innerContext => new CustomSecurityContext(new GenericPrincipal(new GenericIdentity("Kristoffer"), null), innerContext));
 			
-			SecurityContextData.BuildUsing(data =>
+			SecurityContextData.BuildUsing(contextData =>
 			{
-				data.Set(HttpContext.Current.Request.AcceptTypes, "AcceptTypes");
-				data.Set(HttpContext.Current.Server.MachineName, "MachineName");
+				contextData.Set(HttpContext.Current.Request.AcceptTypes, "AcceptTypes");
+				contextData.Set(HttpContext.Current.Server.MachineName, "MachineName");
 			});
 
 			SecurityConfigurator.Configure(configuration =>
