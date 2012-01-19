@@ -71,7 +71,8 @@
     <Compile Include="Configuration\IAdvancedConfiguration.cs" />
     <Compile Include="ExceptionFactory.cs" />
     <Compile Include="HttpContextRequestDescription.cs" />
-    <Compile Include="HybridHttpContextCache.cs" />
+    <Compile Include="ServiceLocation\ObjectLifeCycle\HttpContextLifecycle.cs" />
+    <Compile Include="ServiceLocation\ObjectLifeCycle\HybridHttpContextLifecycle.cs" />
     <Compile Include="IRequestDescription.cs" />
     <Compile Include="PolicyExecutionMode.cs" />
     <Compile Include="Policy\RequireAllRolesPolicy.cs" />
@@ -124,9 +125,12 @@
     <Compile Include="ExceptionPolicyViolationHandler.cs" />
     <Compile Include="ServiceLocation\IContainer.cs" />
     <Compile Include="ServiceLocation\IContainerSource.cs" />
+    <Compile Include="ServiceLocation\ObjectLifeCycle\ILifecycle.cs" />
     <Compile Include="ServiceLocation\LifeCycle.cs" />
+    <Compile Include="ServiceLocation\ObjectLifeCycle\ObjectCache.cs" />
     <Compile Include="ServiceLocation\RegisteredObject.cs" />
     <Compile Include="ServiceLocation\ServiceLocator.cs" />
+    <Compile Include="ServiceLocation\ObjectLifeCycle\ThreadLocalStorageLifecycle.cs" />
     <Compile Include="ServiceLocation\TypeNotRegisteredException.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using FluentSecurity.ServiceLocation;
+using FluentSecurity.ServiceLocation.ObjectLifeCycle;
 
 namespace FluentSecurity
 {
@@ -16,7 +17,7 @@ namespace FluentSecurity
 			// TODO: Move creation to suitable place and pass SecurityContextData to the constructor
 			var contextData = new SecurityContextData();
 			SecurityConfiguration.Current.Advanced.ContextDataBuilder.Invoke(contextData);
-			Data = contextData; 
+			Data = contextData;
 
 			_isAuthenticated = isAuthenticated;
 			_roles = roles;
@@ -36,10 +37,7 @@ namespace FluentSecurity
 
 		public static ISecurityContext Current
 		{
-			get
-			{
-				return ServiceLocator.Current.Resolve<ISecurityContext>();
-			}
+			get { return ServiceLocator.Current.Resolve<ISecurityContext>(); }
 		}
 
 		internal static ISecurityContext CreateFrom(ISecurityConfiguration configuration)
@@ -52,7 +50,7 @@ namespace FluentSecurity
 				var configurationExpression = securityConfiguration.Expression;
 				var externalServiceLocator = configurationExpression.ExternalServiceLocator;
 				if (externalServiceLocator != null)
-					context = externalServiceLocator.Resolve(typeof(ISecurityContext)) as ISecurityContext;
+					context = externalServiceLocator.Resolve(typeof (ISecurityContext)) as ISecurityContext;
 
 				if (context == null)
 				{
@@ -67,7 +65,7 @@ namespace FluentSecurity
 					context = GetFromCacheOrCreateContext(configurationExpression);
 				}
 			}
-			
+
 			return context;
 		}
 
@@ -79,12 +77,12 @@ namespace FluentSecurity
 		private static SecurityContext GetFromCacheOrCreateContext(ConfigurationExpression configurationExpression)
 		{
 			// TODO: Ensure that this context object is cached and only created once per Http request.
-			
-			var context = HybridHttpContextCache.Get<SecurityContext>();
+
+			var context = HybridHttpContextLifecycle.Get<SecurityContext>();
 			if (context != null) return context;
-			
+
 			context = new SecurityContext(configurationExpression.IsAuthenticated, configurationExpression.Roles);
-			HybridHttpContextCache.Store(context);
+			HybridHttpContextLifecycle.Set(context);
 			return context;
 		}
 	}
