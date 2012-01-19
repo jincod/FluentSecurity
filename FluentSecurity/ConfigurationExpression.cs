@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Web.Mvc;
+using FluentSecurity.Configuration;
 using FluentSecurity.Scanning;
 using FluentSecurity.ServiceLocation;
 
@@ -17,10 +18,13 @@ namespace FluentSecurity
 		internal ISecurityServiceLocator ExternalServiceLocator { get; private set; }
 		internal bool ShouldIgnoreMissingConfiguration { get; private set; }
 		private IPolicyAppender PolicyAppender { get; set; }
+		
+		public AdvancedConfigurationExpression Advanced { get; private set; }
 
 		public ConfigurationExpression()
 		{
 			PolicyAppender = new DefaultPolicyAppender();
+			Advanced = new AdvancedConfigurationExpression();
 		}
 
 		public IPolicyContainer For<TController>(Expression<Func<TController, object>> propertyExpression) where TController : Controller

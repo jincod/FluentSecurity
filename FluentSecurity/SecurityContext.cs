@@ -12,7 +12,11 @@ namespace FluentSecurity
 
 		private SecurityContext(Func<bool> isAuthenticated, Func<IEnumerable<object>> roles)
 		{
-			Data = SecurityContextData.Create();
+			// TODO: Document that the factory method will be called once per created security context
+			// TODO: Move creation to suitable place and pass SecurityContextData to the constructor
+			var contextData = new SecurityContextData();
+			SecurityConfiguration.Current.Advanced.ContextDataBuilder.Invoke(contextData);
+			Data = contextData; 
 
 			_isAuthenticated = isAuthenticated;
 			_roles = roles;
@@ -60,7 +64,7 @@ namespace FluentSecurity
 							2) Register an instance of ISecurityContext in your IoC-container and register your container using ResolveServicesUsing().
 							");
 
-					context = new SecurityContext(configurationExpression.IsAuthenticated, configurationExpression.Roles);
+					context = GetFromCacheOrCreateContext(configurationExpression);
 				}
 			}
 			
@@ -70,6 +74,18 @@ namespace FluentSecurity
 		private static bool CanCreateSecurityContextFromConfigurationExpression(ConfigurationExpression expression)
 		{
 			return expression.IsAuthenticated != null;
+		}
+
+		private static SecurityContext GetFromCacheOrCreateContext(ConfigurationExpression configurationExpression)
+		{
+			// TODO: Ensure that this context object is cached and only created once per Http request.
+			
+			var context = HybridHttpContextCache.Get<SecurityContext>();
+			if (context != null) return context;
+			
+			context = new SecurityContext(configurationExpression.IsAuthenticated, configurationExpression.Roles);
+			HybridHttpContextCache.Store(context);
+			return context;
 		}
 	}
 }

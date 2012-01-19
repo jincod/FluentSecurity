@@ -27,21 +27,7 @@ namespace FluentSecurity
 			if (_data.ContainsKey(key) && replaceIfExists == false)
 				throw new ArgumentException(String.Concat("An instance of {0} with the key {1} already exists in the data dictionary.", typeof(T).Name, key), "instance");
 
-			_data.Add(key, instance);
-		}
-
-		private static Action<SecurityContextData> _buildAction = context => {};
-
-		public static void BuildUsing(Action<SecurityContextData> buildAction)
-		{
-			_buildAction = buildAction;
-		}
-
-		public static SecurityContextData Create()
-		{
-			var instance = new SecurityContextData();
-			_buildAction.Invoke(instance);
-			return instance;
+			_data[key] = instance;
 		}
 	}
 }

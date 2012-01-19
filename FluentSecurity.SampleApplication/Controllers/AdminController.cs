@@ -33,5 +33,10 @@ namespace FluentSecurity.SampleApplication.Controllers
     	{
 			return View();
     	}
+
+    	public ActionResult PrincipalContext()
+    	{
+    		return View();
+    	}
     }
 }
