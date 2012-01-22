@@ -25,7 +25,7 @@ namespace FluentSecurity
 		{
 			var key = uniqueKey ?? typeof(T).Name;
 			if (_data.ContainsKey(key) && replaceIfExists == false)
-				throw new ArgumentException(String.Concat("An instance of {0} with the key {1} already exists in the data dictionary.", typeof(T).Name, key), "instance");
+				throw new ArgumentException(String.Format("An instance of {0} with the key {1} already exists in the data dictionary.", typeof(T).Name, key), "instance");
 
 			_data[key] = instance;
 		}

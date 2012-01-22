@@ -4,14 +4,30 @@ namespace FluentSecurity.ServiceLocation.ObjectLifeCycle
 {
 	internal class ThreadLocalStorageLifecycle : ILifecycle
 	{
+		[ThreadStatic] 
+		private static ObjectCache _cache;
+		private readonly object _locker = new object();
+
 		public void EjectAll()
 		{
-			throw new NotImplementedException();
+			FindCache().DisposeAndClear();
 		}
 
 		public ObjectCache FindCache()
 		{
-			throw new NotImplementedException();
+			EnusreCacheExists();
+			return _cache;
+		}
+
+		private void EnusreCacheExists()
+		{
+			if (_cache != null) return;
+			
+			lock (_locker)
+			{
+				if (_cache == null)
+					_cache = new ObjectCache();
+			}
 		}
 	}
 }
