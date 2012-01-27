@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using FluentSecurity.Caching;
 using FluentSecurity.Policy;
 
 namespace FluentSecurity
@@ -41,7 +42,14 @@ namespace FluentSecurity
 			var results = new List<PolicyResult>();
 			foreach (var policy in _policies)
 			{
-				var result = policy.Enforce(context);
+				var defaultCacheLevel = SecurityConfiguration.Current.Advanced.DefaultResultsCacheLevel;
+
+				var result = SecurityCache<PolicyResult>.Get(policy.GetType(), defaultCacheLevel);
+				if (result == null)
+				{
+					result = policy.Enforce(context);
+					SecurityCache<PolicyResult>.Store(result, policy.GetType(), defaultCacheLevel);
+				}
 				results.Add(result);
 
 				if (result.ViolationOccured && PolicyExecutionMode.ShouldStopOnFirstViolation)

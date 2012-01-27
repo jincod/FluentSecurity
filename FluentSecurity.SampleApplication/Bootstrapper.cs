@@ -33,7 +33,9 @@ namespace FluentSecurity.SampleApplication
 
 				//configuration.Advanced.BuildContextUsing(innerContext => new CustomSecurityContext(innerContext));
 				//configuration.Advanced.BuildContextUsing(innerContext => new PrincipalSecurityContext(new GenericPrincipal(new GenericIdentity("Kristoffer"), null), innerContext.Data));
-				
+
+				configuration.Advanced.CacheResults(x => x.DoNotCache);
+
 				configuration.Advanced.BuildContextDataUsing(contextData =>
 				{
 					contextData.Set(HttpContext.Current.Request.AcceptTypes, "AcceptTypes");

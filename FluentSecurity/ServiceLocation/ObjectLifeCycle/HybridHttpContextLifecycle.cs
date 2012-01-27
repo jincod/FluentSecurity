@@ -1,3 +1,5 @@
+using System;
+
 namespace FluentSecurity.ServiceLocation.ObjectLifeCycle
 {
 	// TODO: Ensure this works when unit testing (thread local storage)
@@ -6,7 +8,7 @@ namespace FluentSecurity.ServiceLocation.ObjectLifeCycle
 	internal class HybridHttpContextLifecycle : ILifecycle
 	{
 		private readonly ILifecycle _http;
-		private readonly ILifecycle _nonHttp; // TODO: Change to ThreadLocalStorageLifecycle
+		private readonly ILifecycle _nonHttp;
 
 		public HybridHttpContextLifecycle()
 		{
@@ -29,13 +31,21 @@ namespace FluentSecurity.ServiceLocation.ObjectLifeCycle
 
 		public static void Set<T>(T instance) where T : class
 		{
-			var key = typeof (T);
+			Set(instance, typeof(T));
+		}
+
+		public static void Set<T>(T instance, Type key) where T : class
+		{
 			new HybridHttpContextLifecycle().FindCache().Set(key, instance);
 		}
 
 		public static T Get<T>() where T : class
 		{
-			var key = typeof (T);
+			return Get<T>(typeof (T));
+		}
+
+		public static T Get<T>(Type key) where T : class
+		{
 			return new HybridHttpContextLifecycle().FindCache().Get(key) as T;
 		}
 

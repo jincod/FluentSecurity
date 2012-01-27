@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FluentSecurity.Caching;
 
 namespace FluentSecurity.Configuration
 {
@@ -7,5 +8,6 @@ namespace FluentSecurity.Configuration
 	{
 		IDictionary<Type, object> ContextBuilders { get; }
 		Action<SecurityContextData> ContextDataBuilder { get; }
+		CacheLevel DefaultResultsCacheLevel { get; }
 	}
 }

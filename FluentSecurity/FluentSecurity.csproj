@@ -67,7 +67,10 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Caching\PolicyResultsCache.cs" />
     <Compile Include="Configuration\AdvancedConfigurationExpression.cs" />
+    <Compile Include="Caching\CacheLevel.cs" />
+    <Compile Include="Configuration\CacheLevelExpression.cs" />
     <Compile Include="Configuration\IAdvancedConfiguration.cs" />
     <Compile Include="ExceptionFactory.cs" />
     <Compile Include="HttpContextRequestDescription.cs" />
