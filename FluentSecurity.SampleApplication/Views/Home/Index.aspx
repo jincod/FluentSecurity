@@ -34,6 +34,14 @@
 	<p><%= Html.NavigationLink(Url.Action<AdminController>(x => x.CustomContext(0), new { id = 5 }), "CustomSecurityContext") %></p>
 	<p><%= Html.NavigationLink(Url.Action<AdminController>(x => x.PrincipalContext()), "PrincipalSecurityContext") %></p>
 	
+	<h3>Testing of policy result cache</h3>
+	<p><%= Html.NavigationLink(Url.Action<CacheController>(x => x.PolicyLevel()), "Policy level caching 1") %></p>
+	<p><%= Html.NavigationLink(Url.Action<CacheController>(x => x.PolicyLevel()), "Policy level caching 2") %></p>
+	<p><%= Html.NavigationLink(Url.Action<CacheController>(x => x.ControllerPolicyLevel()), "Controller policy level caching 1") %></p>
+	<p><%= Html.NavigationLink(Url.Action<CacheController>(x => x.ControllerPolicyLevel()), "Controller policy level caching 2") %></p>
+	<p><%= Html.NavigationLink(Url.Action<CacheController>(x => x.ControllerActionPolicyLevel()), "Controller action Policy level caching 1") %></p>
+	<p><%= Html.NavigationLink(Url.Action<CacheController>(x => x.ControllerActionPolicyLevel()), "Controller action Policy level caching 2") %></p>
+
 	<h2>What do I have</h2>
 	<pre><%= Model.WhatDoIHave %></pre>
 </asp:Content>

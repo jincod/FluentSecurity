@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FluentSecurity.Caching;
 using FluentSecurity.Policy;
 
 namespace FluentSecurity
@@ -21,6 +22,19 @@ namespace FluentSecurity
 			foreach (var policyContainer in _policyContainers)
 				policyContainer.AddPolicy(securityPolicy);
 			
+			return this;
+		}
+
+		public IConventionPolicyContainer AddPolicy(ISecurityPolicy securityPolicy, Cache cacheLevel)
+		{
+			return AddPolicy(securityPolicy, new CacheManifest(cacheLevel, CacheKeyType.ControllerPolicyType));
+		}
+
+		public IConventionPolicyContainer AddPolicy(ISecurityPolicy securityPolicy, CacheManifest cacheManifest)
+		{
+			foreach (var policyContainer in _policyContainers)
+				policyContainer.AddPolicy(securityPolicy, cacheManifest);
+
 			return this;
 		}
 

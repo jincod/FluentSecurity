@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.Principal;
 using System.Web;
 using System.Web.Routing;
 using System.Web.Security;
+using FluentSecurity.Caching;
 using FluentSecurity.Policy;
 using FluentSecurity.SampleApplication.Controllers;
 using FluentSecurity.SampleApplication.Models;
@@ -34,7 +36,7 @@ namespace FluentSecurity.SampleApplication
 				//configuration.Advanced.BuildContextUsing(innerContext => new CustomSecurityContext(innerContext));
 				//configuration.Advanced.BuildContextUsing(innerContext => new PrincipalSecurityContext(new GenericPrincipal(new GenericIdentity("Kristoffer"), null), innerContext.Data));
 
-				configuration.Advanced.CacheResults(x => x.DoNotCache);
+				configuration.Advanced.CacheResults(Cache.DoNotCache);
 
 				configuration.Advanced.BuildContextDataUsing(contextData =>
 				{
@@ -43,6 +45,11 @@ namespace FluentSecurity.SampleApplication
 				});
 
 				configuration.For<HomeController>().Ignore();
+
+				var countPolicy = new CountPolicy();
+				configuration.For<CacheController>().AddPolicy(countPolicy, Cache.PerHttpRequest);
+				configuration.For<CacheController>(x => x.ControllerActionPolicyLevel())
+					.RemovePolicy<CountPolicy>().AddPolicy(countPolicy, Cache.DoNotCache);
 
 				configuration.For<AccountController>(x => x.LogInAsAdministrator()).DenyAuthenticatedAccess();
 				configuration.For<AccountController>(x => x.LogInAsPublisher()).DenyAuthenticatedAccess();
@@ -68,6 +75,18 @@ namespace FluentSecurity.SampleApplication
 				configuration.For<Areas.ExampleArea.Controllers.HomeController>(x => x.AdministratorsOnly()).RequireRole(UserRole.Administrator);
 			});
 			return SecurityConfiguration.Current;
+		}
+	}
+
+	public class CountPolicy : ISecurityPolicy
+	{
+		public int Executions { get; private set; }
+
+		public PolicyResult Enforce(ISecurityContext context)
+		{
+			Executions++;
+			Debug.Print("Executed policy {0} times", Executions);
+			return PolicyResult.CreateSuccessResult(this);
 		}
 	}
 

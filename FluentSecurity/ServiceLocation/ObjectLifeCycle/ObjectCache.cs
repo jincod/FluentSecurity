@@ -6,29 +6,44 @@ namespace FluentSecurity.ServiceLocation.ObjectLifeCycle
 	[Serializable]
 	public class ObjectCache
 	{
-		private readonly ConcurrentDictionary<Type, object> _objects = new ConcurrentDictionary<Type, object>();
+		private readonly ConcurrentDictionary<string, object> _objects = new ConcurrentDictionary<string, object>();
 
-		public bool Has(Type key)
+		public bool Has(Type type)
+		{
+			return Has(CacheKeyFor(type));
+		}
+
+		public bool Has(string key)
 		{
 			return _objects.ContainsKey(key);
 		}
 
-		public void Eject(Type key)
+		public void Eject(Type type)
 		{
-			if (!Has(key)) return;
+			if (!Has(type)) return;
 
 			object cachedObject;
-			_objects.TryRemove(key, out cachedObject);
+			_objects.TryRemove(CacheKeyFor(type), out cachedObject);
 
 			TryDispose(cachedObject);
 		}
 
-		public object Get(Type key)
+		public object Get(Type type)
+		{
+			return Get(CacheKeyFor(type));
+		}
+
+		public object Get(string key)
 		{
 			return Has(key) ? _objects[key] : null;
 		}
 
-		public void Set(Type key, object value)
+		public void Set(Type type, object value)
+		{
+			Set(CacheKeyFor(type), value);
+		}
+
+		public void Set(string key, object value)
 		{
 			if (value == null) return;
 			try
@@ -37,9 +52,14 @@ namespace FluentSecurity.ServiceLocation.ObjectLifeCycle
 			}
 			catch (ArgumentException e)
 			{
-				var message = string.Format("An instance of type {0} is already in the cache.", key.FullName);
+				var message = string.Format("An instance of for key {0} is already in the cache.", key);
 				throw new ArgumentException(message, e);
 			}
+		}
+
+		public string CacheKeyFor(Type type)
+		{
+			return type.FullName;
 		}
 
 		public void DisposeAndClear()

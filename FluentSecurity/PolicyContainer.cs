@@ -10,6 +10,7 @@ namespace FluentSecurity
 	public class PolicyContainer : IPolicyContainer
 	{
 		private readonly IList<ISecurityPolicy> _policies;
+		private readonly Dictionary<Type, CacheManifest> _cacheManifest;
 
 		public PolicyContainer(string controllerName, string actionName, IPolicyAppender policyAppender)
 		{
@@ -23,15 +24,17 @@ namespace FluentSecurity
 				throw new ArgumentNullException("policyAppender");
 
 			_policies = new List<ISecurityPolicy>();
+			_cacheManifest = new Dictionary<Type, CacheManifest>();
 
 			ControllerName = controllerName;
 			ActionName = actionName;
-			
+
 			PolicyAppender = policyAppender;
 		}
 
 		public string ControllerName { get; private set; }
 		public string ActionName { get; private set; }
+		
 		public IPolicyAppender PolicyAppender { get; private set; }
 
 		public IEnumerable<PolicyResult> EnforcePolicies(ISecurityContext context)
@@ -39,16 +42,28 @@ namespace FluentSecurity
 			if (_policies.Count.Equals(0))
 				throw ExceptionFactory.CreateConfigurationErrorsException("You must add at least 1 policy for controller {0} action {1}.".FormatWith(ControllerName, ActionName));
 
+			var defaultCacheLevel = SecurityConfiguration.Current.Advanced.DefaultResultsCacheLevel;
+
 			var results = new List<PolicyResult>();
 			foreach (var policy in _policies)
 			{
-				var defaultCacheLevel = SecurityConfiguration.Current.Advanced.DefaultResultsCacheLevel;
+				var policyType = policy.GetType();	
+				
+				var cacheLevel = defaultCacheLevel;
+				var cacheKey = policyType.FullName;
 
-				var result = SecurityCache<PolicyResult>.Get(policy.GetType(), defaultCacheLevel);
+				if (_cacheManifest.ContainsKey(policyType))
+				{
+					var cacheManifest = _cacheManifest[policyType];
+					cacheLevel = cacheManifest.Level;
+					cacheKey = CacheKeyBuilder.Create(cacheManifest, ControllerName, ActionName, policyType);
+				}
+				
+				var result = SecurityCache<PolicyResult>.Get(cacheKey, cacheLevel);
 				if (result == null)
 				{
 					result = policy.Enforce(context);
-					SecurityCache<PolicyResult>.Store(result, policy.GetType(), defaultCacheLevel);
+					SecurityCache<PolicyResult>.Store(result, cacheKey, cacheLevel);
 				}
 				results.Add(result);
 
@@ -62,6 +77,19 @@ namespace FluentSecurity
 		public IPolicyContainer AddPolicy(ISecurityPolicy securityPolicy)
 		{
 			PolicyAppender.UpdatePolicies(securityPolicy, _policies);
+
+			return this;
+		}
+
+		public IPolicyContainer AddPolicy(ISecurityPolicy securityPolicy, Cache level)
+		{
+			return AddPolicy(securityPolicy, new CacheManifest(level, CacheKeyType.ControllerActionPolicyType));
+		}
+
+		public IPolicyContainer AddPolicy(ISecurityPolicy securityPolicy, CacheManifest cacheManifest)
+		{
+			PolicyAppender.UpdatePolicies(securityPolicy, _policies);
+			_cacheManifest[securityPolicy.GetType()] = cacheManifest;
 
 			return this;
 		}

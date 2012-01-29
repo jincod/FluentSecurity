@@ -1,6 +1,6 @@
 namespace FluentSecurity.Caching
 {
-	public enum CacheLevel
+	public enum Cache
 	{
 		PerHttpRequest,
 		PerHttpSession,

@@ -8,6 +8,6 @@ namespace FluentSecurity.Configuration
 	{
 		IDictionary<Type, object> ContextBuilders { get; }
 		Action<SecurityContextData> ContextDataBuilder { get; }
-		CacheLevel DefaultResultsCacheLevel { get; }
+		Cache DefaultResultsCacheLevel { get; }
 	}
 }

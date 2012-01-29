@@ -10,12 +10,12 @@ namespace FluentSecurity.Configuration
 		{
 			ContextBuilders = new Dictionary<Type, object>();
 			ContextDataBuilder = context => { };
-			DefaultResultsCacheLevel = CacheLevel.DoNotCache;
+			DefaultResultsCacheLevel = Cache.DoNotCache;
 		}
 
 		public IDictionary<Type, object> ContextBuilders { get; private set; }
 		public Action<SecurityContextData> ContextDataBuilder { get; private set; }
-		public CacheLevel DefaultResultsCacheLevel { get; private set; }
+		public Cache DefaultResultsCacheLevel { get; private set; }
 
 		public void BuildContextDataUsing(Action<SecurityContextData> buildAction)
 		{
@@ -29,9 +29,9 @@ namespace FluentSecurity.Configuration
 			ContextBuilders.Add(typeof(TSecurityContext), buildAction);
 		}
 
-		public void CacheResults(Func<CacheLevelExpression, CacheLevel> cacheLevelExpression)
+		public void CacheResults(Cache defaultCacheLevel)
 		{
-			DefaultResultsCacheLevel = cacheLevelExpression.Invoke(CacheLevelExpression.Instance);
+			DefaultResultsCacheLevel = defaultCacheLevel;
 		}
 	}
 }
