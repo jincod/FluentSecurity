@@ -50,13 +50,13 @@ namespace FluentSecurity
 				var policyType = policy.GetType();	
 				
 				var cacheLevel = defaultCacheLevel;
-				var cacheKey = policyType.FullName;
+				var cacheKey = CacheKeyBuilder.CreateFromPolicy(policy, context);
 
 				if (_cacheManifest.ContainsKey(policyType))
 				{
 					var cacheManifest = _cacheManifest[policyType];
 					cacheLevel = cacheManifest.Level;
-					cacheKey = CacheKeyBuilder.Create(cacheManifest, ControllerName, ActionName, policyType);
+					cacheKey = CacheKeyBuilder.CreateFromManifest(cacheManifest, ControllerName, ActionName, cacheKey);
 				}
 				
 				var result = SecurityCache<PolicyResult>.Get(cacheKey, cacheLevel);

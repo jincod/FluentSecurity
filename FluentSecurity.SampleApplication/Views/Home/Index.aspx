@@ -28,7 +28,10 @@
 	</ul>
 
 	<h3>Example of route value based policy</h3>
-	<p><%= Html.NavigationLink(Url.Action<AdminController>(x => x.ContextWithRouteValues(0), new { id = 38 }), "RouteValuePolicy") %></p>
+	<p><%= Html.NavigationLink(Url.Action<AdminController>(x => x.ContextWithRouteValues(0), new { id = 38 }), "RouteValuePolicy - Id 38 - Result not cached") %></p>
+	<p><%= Html.NavigationLink(Url.Action<AdminController>(x => x.ContextWithRouteValues(0), new { id = 38 }), "RouteValuePolicy - Id 38 - Result cached") %></p>
+	<p><%= Html.NavigationLink(Url.Action<AdminController>(x => x.ContextWithRouteValues(0), new { id = 38 }), "RouteValuePolicy - Id 38 - Result cached") %></p>
+	<p><%= Html.NavigationLink(Url.Action<AdminController>(x => x.ContextWithRouteValues(0), new { id = 37 }), "RouteValuePolicy - Id 37 - Result not cached") %></p>
 
 	<h3>Examples of custom context based policies</h3>
 	<p><%= Html.NavigationLink(Url.Action<AdminController>(x => x.CustomContext(0), new { id = 5 }), "CustomSecurityContext") %></p>

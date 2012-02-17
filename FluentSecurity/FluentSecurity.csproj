@@ -76,6 +76,7 @@
     <Compile Include="Configuration\IAdvancedConfiguration.cs" />
     <Compile Include="ExceptionFactory.cs" />
     <Compile Include="HttpContextRequestDescription.cs" />
+    <Compile Include="Caching\ICacheKeyProvider.cs" />
     <Compile Include="ServiceLocation\ObjectLifeCycle\HttpContextLifecycle.cs" />
     <Compile Include="ServiceLocation\ObjectLifeCycle\HybridHttpContextLifecycle.cs" />
     <Compile Include="IRequestDescription.cs" />

@@ -66,7 +66,7 @@ namespace FluentSecurity.SampleApplication
 					context => HttpContext.Current.Request.IsLocal
 					);
 
-				configuration.For<AdminController>(x => x.ContextWithRouteValues(0)).Ignore().AddPolicy(new RouteInfoPolicy());
+				configuration.For<AdminController>(x => x.ContextWithRouteValues(0)).Ignore().AddPolicy(new RouteInfoPolicy(), Cache.PerHttpRequest);
 				configuration.For<AdminController>(x => x.CustomContext(0)).Ignore().AddPolicy(new CustomContextPolicy());
 				configuration.For<AdminController>(x => x.PrincipalContext()).Ignore().AddPolicy(new PrincipalContextPolicy());
 
@@ -90,16 +90,27 @@ namespace FluentSecurity.SampleApplication
 		}
 	}
 
-	public class RouteInfoPolicy : ISecurityPolicy
+	public class RouteInfoPolicy : ISecurityPolicy, ICacheKeyProvider
 	{
 		public PolicyResult Enforce(ISecurityContext context)
 		{
-			var routeValues = context.Data.Get<RouteValueDictionary>();
-			var id = routeValues["id"] != null ? int.Parse(routeValues["id"].ToString()) : 0;
-			
+			var id = GetId(context);
+
 			return id != 38
 				? PolicyResult.CreateFailureResult(this, "Number was not 38")
 				: PolicyResult.CreateSuccessResult(this);
+		}
+
+		public string GetCacheKey(ISecurityContext context)
+		{
+			return GetType().FullName + "_" + GetId(context).ToString();
+		}
+
+		private static int GetId(ISecurityContext context)
+		{
+			var routeValues = context.Data.Get<RouteValueDictionary>();
+			var id = routeValues["id"] != null ? int.Parse(routeValues["id"].ToString()) : 0;
+			return id;
 		}
 	}
 
@@ -110,6 +121,11 @@ namespace FluentSecurity.SampleApplication
 			return context.CustomData == "ABC" && context.Id == 38
 				? PolicyResult.CreateFailureResult(this, "Access denied")
 				: PolicyResult.CreateSuccessResult(this);
+		}
+
+		public override string GetCacheKey(CustomSecurityContext context)
+		{
+			return "MyCustomCacheKey";
 		}
 	}
 
