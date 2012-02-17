@@ -10,7 +10,10 @@ namespace FluentSecurity.Caching
 			switch (cache)
 			{
 				case Cache.PerHttpRequest:
-					HybridHttpContextLifecycle.Set(item, key);
+					Lifecycle<HybridHttpContextLifecycle>.Set(item, key);
+					break;
+				case Cache.PerHttpSession:
+					Lifecycle<HttpSessionLifecycle>.Set(item, key);
 					break;
 				case Cache.DoNotCache:
 					break;
@@ -24,12 +27,19 @@ namespace FluentSecurity.Caching
 			switch (cache)
 			{
 				case Cache.PerHttpRequest:
-					return HybridHttpContextLifecycle.Get<T>(key);
+					return Lifecycle<HybridHttpContextLifecycle>.Get<T>(key);
+				case Cache.PerHttpSession:
+					return Lifecycle<HttpSessionLifecycle>.Get<T>(key);
 				case Cache.DoNotCache:
 					return null;
 				default:
 					throw new ArgumentOutOfRangeException("cache");
 			}
+		}
+
+		public static void ClearSession()
+		{
+			Lifecycle<HttpSessionLifecycle>.DisposeAndClearAll();
 		}
 	}
 }

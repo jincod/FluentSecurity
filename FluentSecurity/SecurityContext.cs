@@ -78,11 +78,11 @@ namespace FluentSecurity
 		{
 			// TODO: Ensure that this context object is cached and only created once per Http request.
 
-			var context = HybridHttpContextLifecycle.Get<SecurityContext>();
+			var context = Lifecycle<HybridHttpContextLifecycle>.Get<SecurityContext>();
 			if (context != null) return context;
 
 			context = new SecurityContext(configurationExpression.IsAuthenticated, configurationExpression.Roles);
-			HybridHttpContextLifecycle.Set(context);
+			Lifecycle<HybridHttpContextLifecycle>.Set(context);
 			return context;
 		}
 	}

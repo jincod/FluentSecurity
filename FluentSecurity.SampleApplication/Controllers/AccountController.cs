@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
+using FluentSecurity.Caching;
 using FluentSecurity.SampleApplication.Models;
 using FluentSecurity.SampleApplication.Helpers;
 
 namespace FluentSecurity.SampleApplication.Controllers
 {
-    public class AccountController : Controller
-    {
-        public ActionResult LogInAsAdministrator()
-        {
+	public class AccountController : Controller
+	{
+		public ActionResult LogInAsAdministrator()
+		{
 			SessionContext.Current.User = new User
 				{
 					Roles = new List<UserRole>
@@ -18,7 +19,7 @@ namespace FluentSecurity.SampleApplication.Controllers
 				};
 
 			return Redirect(Url.Action<HomeController>(x => x.Index()));
-        }
+		}
 
 		public ActionResult LogInAsPublisher()
 		{
@@ -39,5 +40,12 @@ namespace FluentSecurity.SampleApplication.Controllers
 
 			return Redirect(Url.Action<HomeController>(x => x.Index()));
 		}
-    }
+
+		public ActionResult ClearSessionCache()
+		{
+			SecurityCache<PolicyResult>.ClearSession();
+
+			return Redirect(Url.Action<HomeController>(x => x.Index()));
+		}
+	}
 }

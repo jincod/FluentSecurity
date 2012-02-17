@@ -1,5 +1,3 @@
-using System;
-
 namespace FluentSecurity.ServiceLocation.ObjectLifeCycle
 {
 	// TODO: Ensure this works when unit testing (thread local storage)
@@ -27,32 +25,6 @@ namespace FluentSecurity.ServiceLocation.ObjectLifeCycle
 			return HttpContextLifecycle.HasContext()
 				? _http.FindCache()
 				: _nonHttp.FindCache();
-		}
-
-		public static void Set<T>(T instance) where T : class
-		{
-			Set(instance, typeof(T).FullName);
-		}
-
-		public static void Set<T>(T instance, string key) where T : class
-		{
-			new HybridHttpContextLifecycle().FindCache().Set(key, instance);
-		}
-
-		public static T Get<T>() where T : class
-		{
-			return Get<T>(typeof (T).FullName);
-		}
-
-		public static T Get<T>(string key) where T : class
-		{
-			return new HybridHttpContextLifecycle().FindCache().Get(key) as T;
-		}
-
-		// TODO: Clear all when a new configuration is set/created??
-		public static void DisposeAndClearAll()
-		{
-			new HybridHttpContextLifecycle().EjectAll();
 		}
 	}
 }

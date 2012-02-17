@@ -8,6 +8,7 @@
 		<%= Html.NavigationLink(Url.Action<AccountController>(x => x.LogInAsAdministrator()), "Log in as administrator", "li") %>
 		<%= Html.NavigationLink(Url.Action<AccountController>(x => x.LogInAsPublisher()), "Log in as publisher", "li") %>
 		<%= Html.NavigationLink(Url.Action<AccountController>(x => x.LogOut()), "Log out", "li") %>
+		<%= Html.NavigationLink(Url.Action<AccountController>(x => x.ClearSessionCache()), "Clear session cache", "li") %>
 	</ul>
 	
 	<h2>Examples</h2>

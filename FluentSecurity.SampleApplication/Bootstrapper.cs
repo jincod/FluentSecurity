@@ -54,6 +54,7 @@ namespace FluentSecurity.SampleApplication
 				configuration.For<AccountController>(x => x.LogInAsAdministrator()).DenyAuthenticatedAccess();
 				configuration.For<AccountController>(x => x.LogInAsPublisher()).DenyAuthenticatedAccess();
 				configuration.For<AccountController>(x => x.LogOut()).DenyAnonymousAccess();
+				configuration.For<AccountController>(x => x.ClearSessionCache()).Ignore();
 
 				configuration.For<ExampleController>(x => x.DenyAnonymousAccess()).DenyAnonymousAccess();
 				configuration.For<ExampleController>(x => x.DenyAuthenticatedAccess()).DenyAuthenticatedAccess();
@@ -66,7 +67,7 @@ namespace FluentSecurity.SampleApplication
 					context => HttpContext.Current.Request.IsLocal
 					);
 
-				configuration.For<AdminController>(x => x.ContextWithRouteValues(0)).Ignore().AddPolicy(new RouteInfoPolicy(), Cache.PerHttpRequest);
+				configuration.For<AdminController>(x => x.ContextWithRouteValues(0)).Ignore().AddPolicy(new RouteInfoPolicy(), Cache.PerHttpSession);
 				configuration.For<AdminController>(x => x.CustomContext(0)).Ignore().AddPolicy(new CustomContextPolicy());
 				configuration.For<AdminController>(x => x.PrincipalContext()).Ignore().AddPolicy(new PrincipalContextPolicy());
 
