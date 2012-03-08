@@ -16,7 +16,10 @@ namespace FluentSecurity
 
 		public IPolicyViolationHandler FindHandlerFor(PolicyViolationException exception)
 		{
-			var matchingHandler = _policyViolationHandlers.SingleOrDefault(handler => HandlerIsMatchForException(handler, exception));
+			var matchingHandler =
+				_policyViolationHandlers.SingleOrDefault(handler => HandlerIsMatchForException(handler, exception)) ??
+				_policyViolationHandlers.SingleOrDefault(handler => handler.GetType().Name == "DefaultPolicyViolationHandler");
+			
 			return matchingHandler;
 		}
 

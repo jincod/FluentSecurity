@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Web.Mvc;
 using FluentSecurity.Policy;
 using FluentSecurity.Specification.TestData;
 using NUnit.Framework;
@@ -66,6 +68,57 @@ namespace FluentSecurity.Specification
 
 			// Assert
 			Assert.That(handler, Is.Null);
+		}
+	}
+
+	[TestFixture]
+	[Category("PolicyViolationHandlerSelectorSpec")]
+	public class When_selecting_a_policy_violation_handler_and_a_default_violation_handler_is_registered
+	{
+		private IPolicyViolationHandlerSelector _violationHandler;
+
+		public class DefaultPolicyViolationHandler : IPolicyViolationHandler
+		{
+			public ActionResult Handle(PolicyViolationException exception)
+			{
+				return new EmptyResult();
+			}
+		}
+
+		[SetUp]
+		public void SetUp()
+		{
+			_violationHandler = new PolicyViolationHandlerSelector(new List<IPolicyViolationHandler>()
+			{
+				new DenyAnonymousAccessPolicyViolationHandler(new EmptyResult()),
+				new DefaultPolicyViolationHandler()
+			});
+		}
+
+		[Test]
+		public void Should_return_handler_for_DenyAnonymousAccessPolicy()
+		{
+			// Arrange
+			var exception = new PolicyViolationException<DenyAnonymousAccessPolicy>("Anonymous access denied");
+
+			// Act
+			var handler = _violationHandler.FindHandlerFor(exception);
+
+			// Assert
+			Assert.That(handler, Is.TypeOf(typeof(DenyAnonymousAccessPolicyViolationHandler)));
+		}
+
+		[Test]
+		public void Should_return_default_policy_violation_handler_when_policy_is_not_DenyAnonymousAccessPolicy()
+		{
+			// Arrange
+			var exception = new PolicyViolationException<RequireRolePolicy>("Access denied");
+
+			// Act
+			var handler = _violationHandler.FindHandlerFor(exception);
+
+			// Assert
+			Assert.That(handler, Is.TypeOf(typeof(DefaultPolicyViolationHandler)));
 		}
 	}
 }
