@@ -1,33 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentSecurity.Policy.ViolationHandlers.Conventions;
 
 namespace FluentSecurity
 {
 	public class PolicyViolationHandlerSelector : IPolicyViolationHandlerSelector
 	{
-		private readonly IEnumerable<IPolicyViolationHandler> _policyViolationHandlers;
+		private readonly IEnumerable<IPolicyViolationHandlerConvention> _conventions;
 
 		public PolicyViolationHandlerSelector(IEnumerable<IPolicyViolationHandler> policyViolationHandlers)
 		{
 			if (policyViolationHandlers == null) throw new ArgumentNullException("policyViolationHandlers");
-			_policyViolationHandlers = policyViolationHandlers;
+
+			var handlers = policyViolationHandlers.ToList();
+
+			_conventions = new List<IPolicyViolationHandlerConvention>
+			{
+				new FindByPolicyViolationHandlerNameConvention(handlers),
+				new FindDefaultPolicyViolationHandlerConvention(handlers)
+			};
 		}
 
 		public IPolicyViolationHandler FindHandlerFor(PolicyViolationException exception)
 		{
-			var matchingHandler =
-				_policyViolationHandlers.SingleOrDefault(handler => HandlerIsMatchForException(handler, exception)) ??
-				_policyViolationHandlers.SingleOrDefault(handler => handler.GetType().Name == "DefaultPolicyViolationHandler");
-			
+			IPolicyViolationHandler matchingHandler = null;
+			foreach (var convention in _conventions)
+			{
+				matchingHandler = convention.GetHandlerFor(exception);
+				if (matchingHandler != null) break;
+			}
 			return matchingHandler;
-		}
-
-		private static bool HandlerIsMatchForException(IPolicyViolationHandler handler, PolicyViolationException exception)
-		{
-			var expectedHandlerName = "{0}ViolationHandler".FormatWith(exception.PolicyType.Name);
-			var actualHandlerName = handler.GetType().Name;
-			return expectedHandlerName == actualHandlerName;
 		}
 	}
 }
