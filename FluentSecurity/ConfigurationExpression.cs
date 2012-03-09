@@ -179,19 +179,24 @@ namespace FluentSecurity
 		public void DefaultPolicyViolationHandlerIs(Func<IPolicyViolationHandler> policyViolationHandler)
 		{
 			RemoveDefaultPolicyViolationHandlerConvention();
-			AppliedConventions.List.Add(new LazyInstancePolicyViolationHandlerConvention(policyViolationHandler));
+			AppliedConventions.Add(new LazyInstancePolicyViolationHandlerConvention(policyViolationHandler));
 		}
 
-		public void DefaultPolicyViolationHandlerIs<TPolicyViolationHandler>() where TPolicyViolationHandler : class, IPolicyViolationHandler
+		public void DefaultPolicyViolationHandlerIs<TPolicyViolationHandler>() where TPolicyViolationHandler : IPolicyViolationHandler
 		{
 			RemoveDefaultPolicyViolationHandlerConvention();
-			AppliedConventions.List.Add(new LazyInstanceOfTypePolicyViolationHandlerConvention<TPolicyViolationHandler>());
+			AppliedConventions.Add(new LazyInstanceOfTypePolicyViolationHandlerConvention<TPolicyViolationHandler>());
 		}
 
 		private void RemoveDefaultPolicyViolationHandlerConvention()
 		{
 			var defaultConvention = AppliedConventions.PolicyViolationHandlerConventions.SingleOrDefault(convention => convention is FindDefaultPolicyViolationHandlerConvention);
-			if (defaultConvention != null) AppliedConventions.List.Remove(defaultConvention);
+			if (defaultConvention != null) AppliedConventions.Remove(defaultConvention);
+		}
+
+		public void Conventions(Action<Conventions> conventionsExpression)
+		{
+			conventionsExpression.Invoke(AppliedConventions);
 		}
 	}
 }

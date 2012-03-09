@@ -129,6 +129,7 @@
     <Compile Include="ServiceLocation\ServiceLocator.cs" />
     <Compile Include="ServiceLocation\TypeNotRegisteredException.cs" />
     <Compile Include="Policy\ViolationHandlers\Conventions\LazyInstancePolicyViolationHandlerConvention.cs" />
+    <Compile Include="ViolationHandlerExpression.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
