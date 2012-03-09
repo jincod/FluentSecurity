@@ -67,6 +67,8 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Conventions.cs" />
+    <Compile Include="Policy\ViolationHandlers\Conventions\LazyInstanceOfTypePolicyViolationHandlerConvention.cs" />
     <Compile Include="Policy\ViolationHandlers\Conventions\FindDefaultPolicyViolationHandlerConvention.cs" />
     <Compile Include="ExceptionFactory.cs" />
     <Compile Include="HttpContextRequestDescription.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="Policy\DelegatePolicy.cs" />
     <Compile Include="Policy\Contexts\DelegateSecurityContext.cs" />
     <Compile Include="Policy\Results\DelegatePolicyResult.cs" />
+    <Compile Include="Policy\ViolationHandlers\Conventions\PolicyViolationHandlerConvention.cs" />
     <Compile Include="Policy\ViolationHandlers\DelegatePolicyViolationHandler.cs" />
     <Compile Include="SecurityContextWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -125,6 +128,7 @@
     <Compile Include="ServiceLocation\RegisteredObject.cs" />
     <Compile Include="ServiceLocation\ServiceLocator.cs" />
     <Compile Include="ServiceLocation\TypeNotRegisteredException.cs" />
+    <Compile Include="Policy\ViolationHandlers\Conventions\LazyInstancePolicyViolationHandlerConvention.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

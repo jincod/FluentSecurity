@@ -14,12 +14,15 @@ namespace FluentSecurity
 			configurationExpression(expression);
 			Expression = expression;
 
+			Conventions = Expression.AppliedConventions;
 			ExternalServiceLocator = Expression.ExternalServiceLocator;
 			IgnoreMissingConfiguration = Expression.ShouldIgnoreMissingConfiguration;
 			PolicyContainers = Expression;
 		}
 
 		internal ConfigurationExpression Expression { get; private set; }
+
+		public Conventions Conventions { get; private set; }
 		public IEnumerable<IPolicyContainer> PolicyContainers { get; private set; }
 		public ISecurityServiceLocator ExternalServiceLocator { get; private set; }
 		public bool IgnoreMissingConfiguration { get; private set; }

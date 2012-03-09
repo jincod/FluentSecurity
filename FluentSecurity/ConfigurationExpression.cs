@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Web.Mvc;
+using FluentSecurity.Policy.ViolationHandlers.Conventions;
 using FluentSecurity.Scanning;
 using FluentSecurity.ServiceLocation;
 
@@ -15,12 +16,14 @@ namespace FluentSecurity
 		internal Func<bool> IsAuthenticated { get; private set; }
 		internal Func<IEnumerable<object>> Roles { get; private set; }
 		internal ISecurityServiceLocator ExternalServiceLocator { get; private set; }
+		internal Conventions AppliedConventions { get; private set; }
 		internal bool ShouldIgnoreMissingConfiguration { get; private set; }
 		private IPolicyAppender PolicyAppender { get; set; }
 
 		public ConfigurationExpression()
 		{
 			PolicyAppender = new DefaultPolicyAppender();
+			AppliedConventions = new Conventions();
 		}
 
 		public IPolicyContainer For<TController>(Expression<Func<TController, object>> propertyExpression) where TController : Controller
@@ -171,6 +174,24 @@ namespace FluentSecurity
 				throw new ArgumentNullException("securityServiceLocator");
 
 			ExternalServiceLocator = securityServiceLocator;
+		}
+
+		public void DefaultPolicyViolationHandlerIs(Func<IPolicyViolationHandler> policyViolationHandler)
+		{
+			RemoveDefaultPolicyViolationHandlerConvention();
+			AppliedConventions.List.Add(new LazyInstancePolicyViolationHandlerConvention(policyViolationHandler));
+		}
+
+		public void DefaultPolicyViolationHandlerIs<TPolicyViolationHandler>() where TPolicyViolationHandler : class, IPolicyViolationHandler
+		{
+			RemoveDefaultPolicyViolationHandlerConvention();
+			AppliedConventions.List.Add(new LazyInstanceOfTypePolicyViolationHandlerConvention<TPolicyViolationHandler>());
+		}
+
+		private void RemoveDefaultPolicyViolationHandlerConvention()
+		{
+			var defaultConvention = AppliedConventions.PolicyViolationHandlerConventions.SingleOrDefault(convention => convention is FindDefaultPolicyViolationHandlerConvention);
+			if (defaultConvention != null) AppliedConventions.List.Remove(defaultConvention);
 		}
 	}
 }

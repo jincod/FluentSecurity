@@ -1,20 +1,12 @@
-using System.Collections.Generic;
 using System.Linq;
 
 namespace FluentSecurity.Policy.ViolationHandlers.Conventions
 {
-	public class FindByPolicyViolationHandlerNameConvention : IPolicyViolationHandlerConvention
+	public class FindByPolicyViolationHandlerNameConvention : PolicyViolationHandlerConvention
 	{
-		private readonly IEnumerable<IPolicyViolationHandler> _policyViolationHandlers;
-
-		public FindByPolicyViolationHandlerNameConvention(IEnumerable<IPolicyViolationHandler> policyViolationHandlers)
+		public override IPolicyViolationHandler GetHandlerFor(PolicyViolationException exception)
 		{
-			_policyViolationHandlers = policyViolationHandlers;
-		}
-
-		public IPolicyViolationHandler GetHandlerFor(PolicyViolationException exception)
-		{
-			return _policyViolationHandlers.SingleOrDefault(handler => HandlerIsMatchForException(handler, exception));
+			return GetHandlers().SingleOrDefault(handler => HandlerIsMatchForException(handler, exception));
 		}
 
 		private static bool HandlerIsMatchForException(IPolicyViolationHandler handler, PolicyViolationException exception)

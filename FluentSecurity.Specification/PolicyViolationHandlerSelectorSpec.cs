@@ -14,7 +14,7 @@ namespace FluentSecurity.Specification
 		[Test]
 		public void Should_throw_when_violation_handlers_is_null()
 		{
-			Assert.Throws<ArgumentNullException>(() => new PolicyViolationHandlerSelector(null));
+			Assert.Throws<ArgumentNullException>(() => new PolicyViolationHandlerSelector((IEnumerable<IPolicyViolationHandler>) null));
 		}
 	}
 

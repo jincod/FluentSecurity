@@ -9,17 +9,13 @@ namespace FluentSecurity
 	{
 		private readonly IEnumerable<IPolicyViolationHandlerConvention> _conventions;
 
-		public PolicyViolationHandlerSelector(IEnumerable<IPolicyViolationHandler> policyViolationHandlers)
+		public PolicyViolationHandlerSelector(IEnumerable<IPolicyViolationHandler> policyViolationHandlers) {}
+
+		public PolicyViolationHandlerSelector(Func<IEnumerable<IPolicyViolationHandlerConvention>> conventions)
 		{
-			if (policyViolationHandlers == null) throw new ArgumentNullException("policyViolationHandlers");
-
-			var handlers = policyViolationHandlers.ToList();
-
-			_conventions = new List<IPolicyViolationHandlerConvention>
-			{
-				new FindByPolicyViolationHandlerNameConvention(handlers),
-				new FindDefaultPolicyViolationHandlerConvention(handlers)
-			};
+			if (conventions == null) throw new ArgumentNullException("conventions");
+			
+			_conventions = conventions.Invoke();
 		}
 
 		public IPolicyViolationHandler FindHandlerFor(PolicyViolationException exception)
