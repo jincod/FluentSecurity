@@ -13,7 +13,7 @@ namespace FluentSecurity.SampleApplication.Helpers
 			if (policyContainer != null)
 			{
 				var context = SecurityContext.Current;
-				context.Data.Set(routeValueDictionary, replaceIfExists: true);
+				context.Data.RouteValues = routeValueDictionary;
 				var results = policyContainer.EnforcePolicies(context);
 				return results.All(x => x.ViolationOccured == false);
 			}

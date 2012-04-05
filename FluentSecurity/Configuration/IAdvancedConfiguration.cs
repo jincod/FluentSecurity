@@ -6,6 +6,6 @@ namespace FluentSecurity.Configuration
 	public interface IAdvancedConfiguration
 	{
 		IDictionary<Type, object> ContextBuilders { get; }
-		Action<SecurityContextData> ContextDataBuilder { get; }
+		//Action<dynamic> ContextDataBuilder { get; }
 	}
 }

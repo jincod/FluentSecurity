@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Dynamic;
 using FluentSecurity.ServiceLocation;
 using FluentSecurity.ServiceLocation.ObjectLifeCycle;
 
@@ -15,15 +16,15 @@ namespace FluentSecurity
 		{
 			// TODO: Document that the factory method will be called once per created security context
 			// TODO: Move creation to suitable place and pass SecurityContextData to the constructor
-			var contextData = new SecurityContextData();
-			SecurityConfiguration.Current.Advanced.ContextDataBuilder.Invoke(contextData);
-			Data = contextData;
+			//var contextData = new SecurityContextData();
+			//SecurityConfiguration.Current.Advanced.ContextDataBuilder.Invoke(contextData);
+			Data = new ExpandoObject();
 
 			_isAuthenticated = isAuthenticated;
 			_roles = roles;
 		}
 
-		public SecurityContextData Data { get; private set; }
+		public dynamic Data { get; private set; }
 
 		public bool CurrenUserAuthenticated()
 		{

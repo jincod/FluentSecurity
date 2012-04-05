@@ -11,7 +11,7 @@ namespace FluentSecurity
 			_securityContext = innerSecurityContext;
 		}
 		
-		public SecurityContextData Data
+		public dynamic Data
 		{
 			get { return _securityContext.Data; }
 		}

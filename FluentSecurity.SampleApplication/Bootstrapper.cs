@@ -31,14 +31,19 @@ namespace FluentSecurity.SampleApplication
 					return results;
 				});
 
-				//configuration.Advanced.BuildContextUsing(innerContext => new CustomSecurityContext(innerContext));
+				configuration.Advanced.BuildContextUsing(innerContext =>
+				{
+					innerContext.Data.AcceptTypes = HttpContext.Current.Request.AcceptTypes;
+					innerContext.Data.MachineName = HttpContext.Current.Server.MachineName;
+					return new CustomSecurityContext(innerContext);
+				});
 				//configuration.Advanced.BuildContextUsing(innerContext => new PrincipalSecurityContext(new GenericPrincipal(new GenericIdentity("Kristoffer"), null), innerContext.Data));
 				
-				configuration.Advanced.BuildContextDataUsing(contextData =>
-				{
-					contextData.Set(HttpContext.Current.Request.AcceptTypes, "AcceptTypes");
-					contextData.Set(HttpContext.Current.Server.MachineName, "MachineName");
-				});
+				//configuration.Advanced.BuildContextDataUsing(contextData =>
+				//{
+				//    contextData.Set(HttpContext.Current.Request.AcceptTypes, "AcceptTypes");
+				//    contextData.Set(HttpContext.Current.Server.MachineName, "MachineName");
+				//});
 
 				configuration.For<HomeController>().Ignore();
 
@@ -73,7 +78,7 @@ namespace FluentSecurity.SampleApplication
 	{
 		public PolicyResult Enforce(ISecurityContext context)
 		{
-			var routeValues = context.Data.Get<RouteValueDictionary>();
+			var routeValues = (RouteValueDictionary) context.Data.RouteValues;
 			var id = routeValues["id"] != null ? int.Parse(routeValues["id"].ToString()) : 0;
 			
 			return id != 38
@@ -102,15 +107,14 @@ namespace FluentSecurity.SampleApplication
 		}
 	}
 
-	public class CustomSecurityContext : SecurityContextWrapper
+	public class CustomSecurityContext : MvcSecurityContext
 	{
 		public string CustomData { get; private set; }
-		public int Id { get; set; }
+		public int Id { get; private set; }
 
 		public CustomSecurityContext(ISecurityContext innerSecurityContext) : base(innerSecurityContext)
 		{
-			var routeValues = Data.Get<RouteValueDictionary>();
-			var id = routeValues["id"] != null ? int.Parse(routeValues["id"].ToString()) : 0;
+			var id = RouteValues["id"] != null ? int.Parse(RouteValues["id"].ToString()) : 0;
 
 			CustomData = "ABC";
 			Id = id;
@@ -120,9 +124,9 @@ namespace FluentSecurity.SampleApplication
 	public class PrincipalSecurityContext : ISecurityContext
 	{
 		public IPrincipal Principal { get; private set; }
-		public SecurityContextData Data { get; private set; }
+		public dynamic Data { get; private set; }
 
-		public PrincipalSecurityContext(IPrincipal principal, SecurityContextData innerContextData)
+		public PrincipalSecurityContext(IPrincipal principal, dynamic innerContextData)
 		{
 			Principal = principal;
 			Data = innerContextData;
