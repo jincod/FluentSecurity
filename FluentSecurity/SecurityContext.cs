@@ -8,14 +8,14 @@ namespace FluentSecurity
 {
 	public class SecurityContext : ISecurityContext
 	{
-		private readonly ExpandoObject _data;
 		private readonly Func<bool> _isAuthenticated;
 		private readonly Func<IEnumerable<object>> _roles;
 
 		private SecurityContext(ConfigurationExpression configurationExpression)
 		{
 			Id = Guid.NewGuid();
-			_data = new ExpandoObject();
+			Data = new ExpandoObject();
+
 			_isAuthenticated = configurationExpression.IsAuthenticated;
 			_roles = configurationExpression.Roles;
 
@@ -24,11 +24,7 @@ namespace FluentSecurity
 		}
 
 		public Guid Id { get; private set; }
-
-		public dynamic Data
-		{
-			get { return _data; }
-		}
+		public dynamic Data { get; private set; }
 
 		public bool CurrentUserIsAuthenticated()
 		{
