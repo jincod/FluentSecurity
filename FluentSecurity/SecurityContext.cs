@@ -14,6 +14,7 @@ namespace FluentSecurity
 
 		private SecurityContext(ConfigurationExpression configurationExpression)
 		{
+			Id = Guid.NewGuid();
 			_data = new ExpandoObject();
 			_isAuthenticated = configurationExpression.IsAuthenticated;
 			_roles = configurationExpression.Roles;
@@ -21,6 +22,8 @@ namespace FluentSecurity
 			var modifyer = configurationExpression.Advanced.SecurityContextModifyer;
 			if (modifyer != null) modifyer.Invoke(this);
 		}
+
+		public Guid Id { get; private set; }
 
 		public dynamic Data
 		{
